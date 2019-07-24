@@ -1,0 +1,3 @@
+[submodule "cross"]
+	path = cross
+	url = https://bitbucket.org/ali-asadpoor/cross-platform
