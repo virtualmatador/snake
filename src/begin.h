@@ -17,7 +17,9 @@ namespace main
 {
     class Begin : public core::Runner {
     private:
-        int data_;
+        int data_x_;
+        int data_y_;
+        double salt_;
 
     public:
         Begin();
