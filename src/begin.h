@@ -17,13 +17,16 @@ namespace main
 {
     class Begin : public core::Runner {
     private:
+        int column_;
+        std::vector<unsigned char> pattern_;
+
         int data_x_;
         int data_y_;
-        double salt_;
 
     public:
         Begin();
         ~Begin();
+        void Initial() override;
         void Step(__int32_t* pixels) override;
         void TouchBegin(float x, float y) override;
         void TouchMove(float x, float y) override;
