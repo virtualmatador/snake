@@ -11,6 +11,7 @@
 #include "begin.h"
 #include "error.h"
 
+
 PROGRESS progress_;
 
 void life_cycle::Begin()

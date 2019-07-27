@@ -24,6 +24,11 @@ main::Error::~Error()
 {
 }
 
+void main::Error::Escape()
+{
+    bridge::Exit();
+}
+
 void main::Error::LoadInput(const char* id)
 {
     std::ostringstream js;

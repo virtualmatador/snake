@@ -13,6 +13,7 @@
 
 #include "progress.h"
 
+
 namespace main
 {
     class Error: public core::Stage
@@ -20,6 +21,8 @@ namespace main
     public:
         Error();
         ~Error();
+
+        void Escape() override;
 
     private:
         void LoadInput(const char* id);
