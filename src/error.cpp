@@ -17,17 +17,33 @@ main::Error::Error()
         else if (std::strcmp(command, "click") == 0)
             Retry();
     };
+    handlers_["menu"] = [&](const char* command, const char* info)
+    {
+        if (strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "+") == 0)
+            OnShowMenu();
+        else if (std::strcmp(command, "-") == 0)
+            OnHideMenu();
+        else if (std::strcmp(command, "Back") == 0)
+            bridge::Exit();
+    };
     bridge::LoadWebView(index_, (__int32_t)core::VIEW_INFO::Default, "error");
+    bridge::AddMenu("Back");
 }
 
 main::Error::~Error()
 {
 }
 
-void main::Error::Escape()
+void main::Error::OnShowMenu()
 {
-    bridge::Exit();
 }
+
+void main::Error::OnHideMenu()
+{
+}
+
 
 void main::Error::LoadInput(const char* id)
 {

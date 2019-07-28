@@ -52,7 +52,6 @@ namespace main
         Begin();
         ~Begin();
 
-        void Escape() override;
         void Initial() override;
         void Step(__uint32_t* pixels) override;
         void TouchBegin(const float x, const float y) override;
@@ -60,6 +59,10 @@ namespace main
         void TouchEnd(const float x, const float y) override;
 
     private:
+        void OnShowMenu();
+        void OnHideMenu();
+        void Back();
+
         void MoveCell(const int part, int & y, int & x);
         void MoveHead(const int part, int & y, int & x);
         void Play();
