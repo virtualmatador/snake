@@ -128,7 +128,7 @@ void main::Begin::Initial()
     cell_size_ = std::min((width_ - column_ * 2) / CX, height_ / CY);
     margin_x_ = (width_ - cell_size_ * CX) / 2;
     margin_y_ = (height_ - cell_size_ * CY) / 2;
-    pattern_target_ = steriogram::CreateRandomPattern<4>(column_);
+    pattern_target_ = steriogram::CreateRandomPattern<4>(column_, order_rgba_);
     pattern_current_.resize(pattern_target_.size());
     pattern_base_.resize(pattern_target_.size());
 }
@@ -139,7 +139,7 @@ void main::Begin::Step(__uint32_t* pixels)
     {
         frame_ = 0;
         std::swap(pattern_base_, pattern_target_);
-        pattern_target_ = steriogram::CreateRandomPattern<4>(column_);
+        pattern_target_ = steriogram::CreateRandomPattern<4>(column_, order_rgba_);
         pattern_current_ = pattern_base_;
     }
     else
@@ -248,13 +248,13 @@ void main::Begin::ApplyBoard(__uint32_t *pixels)
             case CellType::Empty:
                 break;
             case CellType::Food:
-                DrawSquare(pixels, i, j, 96 << 24 | 96 << 16  | 96 << 8 | 96 < 0);
+                DrawSquare(pixels, i, j, 96 << 24 | 96 << 16  | 96 << 8 | 96 << 0);
                 break;
             case CellType::Head:
-                DrawSquare(pixels, i, j, 64 << 24 | 64 << 16  | 64 << 8 | 64 < 0);
+                DrawSquare(pixels, i, j, 64 << 24 | 64 << 16  | 64 << 8  | 64 << 0);
                 break;
             case CellType::Tail:
-                DrawSquare(pixels, i, j, 48 << 24 | 48 << 16  | 48 << 8 | 48 < 0);
+                DrawSquare(pixels, i, j, 48 << 24 | 48 << 16  | 48 << 8  | 48 << 0);
                 break;
             }
         }
