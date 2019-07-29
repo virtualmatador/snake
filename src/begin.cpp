@@ -18,7 +18,8 @@
 main::Begin::Begin()
     : core::Runner(
         (__int32_t)core::VIEW_INFO::Landscape |
-        (__int32_t)core::VIEW_INFO::ScreenOn, 480)
+        (__int32_t)core::VIEW_INFO::ScreenOn |
+        (__int32_t)core::VIEW_INFO::CloseMenu, 480)
     , column_{0}
     , cell_size_{0}
     , margin_x_{0}
@@ -62,18 +63,6 @@ main::Begin::Begin()
         snake_.push_back(3);
         side_ = 3;
     }
-    handlers_["menu"] = [&](const char* command, const char* info)
-    {
-        if (strlen(command) == 0)
-            return;
-        else if (std::strcmp(command, "+") == 0)
-            OnShowMenu();
-        else if (std::strcmp(command, "-") == 0)
-            OnHideMenu();
-        else if (std::strcmp(command, "Back") == 0)
-            Back();
-    };
-    bridge::AddMenu("Back");
 }
 
 main::Begin::~Begin()
@@ -106,18 +95,10 @@ main::Begin::~Begin()
     bridge::SetPreference("Begin", composer.str().c_str());
 }
 
-void main::Begin::OnShowMenu()
-{
-}
-
-void main::Begin::OnHideMenu()
-{
-}
-
-void main::Begin::Back()
+void main::Begin::Escape()
 {
     progress_ = PROGRESS::ERROR;
-    bridge::OnRestart();
+    bridge::NeedRestart();
 }
 
 void main::Begin::Initial()

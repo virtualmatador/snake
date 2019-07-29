@@ -21,10 +21,9 @@ namespace main
     public:
         Error();
         ~Error();
+        void Escape() override;
 
     private:
-        void OnShowMenu();
-        void OnHideMenu();
         void LoadInput(const char* id);
         void SaveInput(const char* id, const char* value);
         void Retry();
