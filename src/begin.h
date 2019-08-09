@@ -9,6 +9,7 @@
 #ifndef SRC_BEGIN_H
 #define SRC_BEGIN_H
 
+#include <vector>
 #include <list>
 
 #include "../cross/core/runner.h"

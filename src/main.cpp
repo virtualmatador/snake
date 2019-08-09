@@ -6,6 +6,8 @@
 //  Copyright © 2019 Shaidin. All rights reserved.
 //
 
+#include <sstream>
+
 #include "../cross/core/main.h"
 
 #include "begin.h"

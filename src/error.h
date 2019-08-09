@@ -27,6 +27,8 @@ namespace main
         void LoadInput(const char* id);
         void SaveInput(const char* id, const char* value);
         void Retry();
+        void Https();
+        void Response(const char* response);
     };
 }
 

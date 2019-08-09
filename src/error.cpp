@@ -5,6 +5,11 @@
 //  Created by Ali Asadpoor on 4/12/19.
 //  Copyright © 2019 Shaidin. All rights reserved.
 //
+
+#include <sstream>
+
+#include "../cross/core/helper.h"
+
 #include "error.h"
 
 
@@ -16,6 +21,20 @@ main::Error::Error()
             return;
         else if (std::strcmp(command, "click") == 0)
             Retry();
+    };
+    handlers_["https"] = [&](const char* command, const char* info)
+    {
+        if (strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "click") == 0)
+            Https();
+    };
+    handlers_["http"] = [&](const char* command, const char* info)
+    {
+        if (strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "echo") == 0)
+            Response(info);
     };
     bridge::LoadWebView(index_, (__int32_t)core::VIEW_INFO::Default, "error");
 }
@@ -45,4 +64,19 @@ void main::Error::Retry()
 {
     progress_ = PROGRESS::BEGIN;
     bridge::NeedRestart();
+}
+
+void main::Error::Https()
+{
+    std::list<std::pair<std::string, std::string>> params;
+    params.push_back({"name", "ali&me=kazem&a=:\"<%>"});
+    helper::Http("https://postman-echo.com/post", params, "echo");
+}
+
+
+void main::Error::Response(const char* response)
+{
+    std::ostringstream composer;
+    composer << "document.getElementById(\"id-response\").innerHTML=\"" << helper::EscapeHtml(response) << "\";";
+    bridge::CallFunction(composer.str().c_str());
 }
