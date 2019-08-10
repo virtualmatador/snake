@@ -70,7 +70,7 @@ void main::Error::Https()
 {
     std::list<std::pair<std::string, std::string>> params;
     params.push_back({"name", "ali&me=kazem&a=:\"<%>"});
-    helper::Http("https://postman-echo.com/post", params, "echo");
+    helper::Http("https://postman-echo.com/post", params, "http", "echo");
 }
 
 

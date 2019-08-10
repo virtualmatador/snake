@@ -1,9 +1,9 @@
 function retry()
 {
-    CallHandler("retry click");
+    CallHandler("retry", "click", "");
 }
 
 function https()
 {
-    CallHandler("https click");
+    CallHandler("https", "click", "");
 }
