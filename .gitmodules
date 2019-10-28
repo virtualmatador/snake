@@ -1,6 +1,6 @@
 [submodule "cross"]
 	path = cross
-	url = https://bitbucket.org/ali-asadpoor/cross-platform
+	url = ../cross-platform
 [submodule "src/steriogram"]
 	path = src/steriogram
-	url = https://bitbucket.org/ali-asadpoor/steriogram
+	url = ../steriogram
