@@ -12,7 +12,7 @@
 #include <vector>
 #include <list>
 
-#include "../cross/core/runner.h"
+#include "../cross/core/src/runner.h"
 
 #include "progress.h"
 

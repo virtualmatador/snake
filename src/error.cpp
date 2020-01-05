@@ -8,7 +8,7 @@
 
 #include <sstream>
 
-#include "../cross/core/helper.h"
+#include "../cross/core/src/helper.h"
 
 #include "error.h"
 

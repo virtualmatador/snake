@@ -8,7 +8,7 @@
 
 #include <sstream>
 
-#include "../cross/core/main.h"
+#include "../cross/core/src/main.h"
 
 #include "begin.h"
 #include "error.h"

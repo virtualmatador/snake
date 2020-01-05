@@ -9,7 +9,7 @@
 #ifndef SRC_ERROR_H
 #define SRC_ERROR_H
 
-#include "../cross/core/stage.h"
+#include "../cross/core/src/stage.h"
 
 #include "progress.h"
 
