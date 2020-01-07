@@ -23,8 +23,8 @@ main::Begin::Begin()
         (__int32_t)core::VIEW_INFO::CloseMenu, 480)
     , column_{0}
     , cell_size_{0}
-    , margin_x_{0}
-    , margin_y_{0}
+    , margin_{0, 0}
+    , touch_{0, 0}
     , frame_{0}
 {
     std::istringstream parser;
@@ -102,14 +102,15 @@ void main::Begin::Escape()
     bridge::NeedRestart();
 }
 
-void main::Begin::Initial()
+void main::Begin::Initial(__uint32_t* pixels)
 {
-    frame_ = FR - 2;
+    memset(pixels, 0, width_ * height_ * 4);
+    frame_ = -1;
     frame_lenght_ = std::operator""ms((unsigned long long)50);
     column_ = dpi_ / 2;
     cell_size_ = std::min((width_ - column_ * 2) / CX, height_ / CY);
-    margin_x_ = (width_ - cell_size_ * CX) / 2;
-    margin_y_ = (height_ - cell_size_ * CY) / 2;
+    margin_[0] = (height_ - cell_size_ * CY) / 2;
+    margin_[1] = (width_ - cell_size_ * CX) / 2;
     pattern_target_ = steriogram::CreateRandomPattern<4>(column_, order_rgba_);
     pattern_current_.resize(pattern_target_.size());
     pattern_base_.resize(pattern_target_.size());
@@ -117,26 +118,25 @@ void main::Begin::Initial()
 
 void main::Begin::Step(__uint32_t* pixels)
 {
-    if (++frame_ == FR - 1)
-    {
+    if (++frame_ ==  FR * (20 - level_))
         frame_ = 0;
+    if (frame_ % (20 - level_) == 0)
+        Play();
+    if (frame_ % FR == 0)
+    {
         std::swap(pattern_base_, pattern_target_);
         pattern_target_ = steriogram::CreateRandomPattern<4>(column_, order_rgba_);
-        pattern_current_ = pattern_base_;
     }
-    else
-    {
-        for (int i = 0; i < pattern_current_.size(); ++i)
-            pattern_current_[i] = ((int) pattern_target_[i] * frame_ + (int) pattern_base_[i] * (FR - 1 - frame_)) / (FR - 1);
-    }
-    Play();
-    memset(pixels, 0, width_ * height_ * 4);
+    for (int i = 0; i < pattern_current_.size(); ++i)
+        pattern_current_[i] = ((int) pattern_target_[i] * (frame_ % FR) + (int) pattern_base_[i] * (FR - (frame_ % FR))) / FR;
     ApplyBoard(pixels);
     steriogram::Convert<4, 32>((unsigned char*)pixels, column_, width_, height_, pattern_current_.data());
 }
 
 void main::Begin::TouchBegin(const float x, const float y)
 {
+    touch_[0] = y;
+    touch_[1] = x;
 }
 
 void main::Begin::TouchMove(const float x, const float y)
@@ -145,6 +145,34 @@ void main::Begin::TouchMove(const float x, const float y)
 
 void main::Begin::TouchEnd(const float x, const float y)
 {
+    touch_[0] = y - touch_[0];
+    touch_[1] = x - touch_[1];
+    if (std::abs(touch_[0]) > std::abs(touch_[1]))
+    {
+        if (touch_[0] < 0)
+        {
+            if (side_ != 3)
+                side_ = 2;
+        }
+        else
+        {
+            if (side_ != 2)
+                side_ = 3;
+        }
+    }
+    else
+    {
+        if (touch_[1] < 0)
+        {
+            if (side_ != 1)
+            side_ = 0;
+        }
+        else
+        {
+            if (side_ != 0)
+                side_ = 1;
+        }
+    }
 }
 
 void main::Begin::MoveCell(const int part, int & y, int & x)
@@ -166,31 +194,57 @@ void main::Begin::MoveCell(const int part, int & y, int & x)
     }
 }
 
-void main::Begin::MoveHead(const int part, int & y, int & x)
+bool main::Begin::MoveHead(const int part, int & y, int & x)
 {
     switch (part)
     {
-        case 0:
+    case 0:
+        if (x > 0)
             --x;
-            break;
-        case 1:
+        else return false;
+        break;
+    case 1:
+        if (x < CX - 1)
             ++x;
-            break;
-        case 2:
+        else
+            return false;
+        break;
+    case 2:
+        if (y > 0)
             --y;
-            break;
-        case 3:
+        else
+            return false;
+        break;
+    case 3:
+        if (y < CY - 1)
             ++y;
-            break;
+        else
+            return false;
+        break;
     }
+    if (food_[0] == y && food_[1] == x)
+        snake_.push_back(-1);
+    return true;
 }
 
 void main::Begin::Play()
 {
-//    MoveHead(side_, head_[0], head_[1]);
+    if (!MoveHead(side_, head_[0], head_[1]))
+    {
+        if (--lives_ > 0)
+        {
+            // Reset scene
+            head_[0] = 3;
+            head_[1] = 0;
+        }
+        else
+        {
+            // GameOver();
+        }
+    }
     snake_.push_front(side_);
     snake_.pop_back();
-    DrawBoard();
+    return DrawBoard();
 }
 
 void main::Begin::DrawBoard()
@@ -198,8 +252,8 @@ void main::Begin::DrawBoard()
     for (int i = 0; i < CY; ++i)
         for (int j = 0; j < CX; ++j)
             board_[i][j] = CellType::Empty;
-    DrawSnake();
     DrawFood();
+    DrawSnake();
 }
 
 void main::Begin::DrawSnake()
@@ -221,6 +275,19 @@ void main::Begin::DrawFood()
 
 void main::Begin::ApplyBoard(__uint32_t *pixels)
 {
+    for (int i = 0; i < margin_[0]; ++i)
+        for (int j = 0; j < width_; ++j)
+            pixels[i * width_ + j] = 0;
+    for (int i = margin_[0]; i < height_- margin_[0]; ++i)
+    {
+        for (int j = 0; j < margin_[1]; ++j)
+            pixels[i * width_ + j] = 0;
+        for (int j = width_ - margin_[1]; j < width_; ++j)
+            pixels[i * width_ + j] = 0;
+    }
+    for (int i = height_ - margin_[0]; i < height_; ++i)
+        for (int j = 0; j < width_; ++j)
+            pixels[i * width_ + j] = 0;
     for (int i = 0; i < CY; ++i)
     {
         for (int j = 0; j < CX; ++j)
@@ -228,6 +295,7 @@ void main::Begin::ApplyBoard(__uint32_t *pixels)
             switch (board_[i][j])
             {
             case CellType::Empty:
+                DrawSquare(pixels, i, j, 0 << 24 | 0 << 16  | 0 << 8 | 0 << 0);
                 break;
             case CellType::Food:
                 DrawSquare(pixels, i, j, 96 << 24 | 96 << 16  | 96 << 8 | 96 << 0);
@@ -245,7 +313,7 @@ void main::Begin::ApplyBoard(__uint32_t *pixels)
 
 void main::Begin::DrawSquare(__uint32_t* pixels, const int y, const int x, const __uint32_t color)
 {
-    for (int i = margin_y_ + y * cell_size_; i < margin_y_ + cell_size_ + y * cell_size_; ++i)
-        for (int j = margin_x_ + x * cell_size_; j < margin_x_ + cell_size_ + x * cell_size_; ++j)
+    for (int i = margin_[0] + y * cell_size_; i < margin_[0] + cell_size_ + y * cell_size_; ++i)
+        for (int j = margin_[1] + x * cell_size_; j < margin_[1] + cell_size_ + x * cell_size_; ++j)
             pixels[i * width_ + j] = color;
 }

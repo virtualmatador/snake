@@ -34,8 +34,8 @@ namespace main
         int frame_;
         int column_;
         int cell_size_;
-        int margin_x_;
-        int margin_y_;
+        int margin_[2];
+        float touch_[2];
         CellType board_[CY][CX];
         std::vector<unsigned char> pattern_base_;
         std::vector<unsigned char> pattern_current_;
@@ -54,7 +54,7 @@ namespace main
         ~Begin();
 
         void Escape() override;
-        void Initial() override;
+        void Initial(__uint32_t* pixels) override;
         void Step(__uint32_t* pixels) override;
         void TouchBegin(const float x, const float y) override;
         void TouchMove(const float x, const float y) override;
@@ -63,7 +63,7 @@ namespace main
     private:
 
         void MoveCell(const int part, int & y, int & x);
-        void MoveHead(const int part, int & y, int & x);
+        bool MoveHead(const int part, int & y, int & x);
         void Play();
         void DrawBoard();
         void DrawSnake();
