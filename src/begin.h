@@ -9,34 +9,35 @@
 #ifndef SRC_BEGIN_H
 #define SRC_BEGIN_H
 
-#include <vector>
+#include <array>
 #include <list>
+#include <vector>
 
 #include "../cross/core/src/runner.h"
 
 #include "progress.h"
 
-#define CX 12
-#define CY 8
+#define CX 20
+#define CY 10
 #define FR 4
 
 namespace main
 {
     class Begin : public core::Runner {
     private:
-        enum CellType: unsigned char
-        {
-            Empty,
-            Food,
-            Head,
-            Tail,
-        };
-        int frame_;
+        static const uint32_t color_empty_ = 0 << 24 | 0 << 16 | 0 << 8 | 0 << 0;
+        static const uint32_t color_food_ = 80 << 24 | 80 << 16 | 80 << 8 | 80 << 0;
+        static const uint32_t color_head_ = 64 << 24 | 64 << 16 | 64 << 8 | 64 << 0;
+        static const uint32_t color_tail_ = 48 << 24 | 48 << 16 | 48 << 8 | 48 << 0;
+        static const uint32_t color_border_ = 32 << 24 | 32 << 16 | 32 << 8 | 32 << 0;
+        bool pause_;
+        int pattern_frame_;
+        int game_frame_;
         int column_;
-        int cell_size_;
+        int cell_;
+        int border_;
         int margin_[2];
         float touch_[2];
-        CellType board_[CY][CX];
         std::vector<unsigned char> pattern_base_;
         std::vector<unsigned char> pattern_current_;
         std::vector<unsigned char> pattern_target_;
@@ -44,9 +45,8 @@ namespace main
         int score_;
         int level_;
         int lives_;
-        int food_[2];
-        int head_[2];
-        std::list<unsigned char> snake_;
+        std::array<int, 2> food_;
+        std::list<std::array<int, 2>> parts_;
         unsigned char side_;
 
     public:
@@ -54,22 +54,21 @@ namespace main
         ~Begin();
 
         void Escape() override;
-        void Initial(__uint32_t* pixels) override;
+        void Initial() override;
         void Step(__uint32_t* pixels) override;
+        void ResetSnake();
+        void ResetFood();
         void TouchBegin(const float x, const float y) override;
         void TouchMove(const float x, const float y) override;
         void TouchEnd(const float x, const float y) override;
 
     private:
 
-        void MoveCell(const int part, int & y, int & x);
-        bool MoveHead(const int part, int & y, int & x);
+        bool Move();
         void Play();
-        void DrawBoard();
-        void DrawSnake();
-        void DrawFood();
         void ApplyBoard(__uint32_t* pixels);
-        void DrawSquare(__uint32_t* pixels, const int y, const int x, const __uint32_t color);
+        void DrawBorder(__uint32_t* pixels, const __uint32_t color);
+        void DrawSquare(__uint32_t* pixels, const std::array<int, 2> & target, const __uint32_t color);
     };
 }
 
