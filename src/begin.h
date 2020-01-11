@@ -47,7 +47,7 @@ namespace main
         int lives_;
         std::array<int, 2> food_;
         std::list<std::array<int, 2>> parts_;
-        unsigned char side_;
+        int side_;
 
     public:
         Begin();

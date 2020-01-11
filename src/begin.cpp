@@ -38,9 +38,9 @@ main::Begin::Begin()
     {
         toolbox::Load(parser, level_, 0, 5);
         toolbox::Load(parser, lives_, 0, 5);
-        toolbox::Load(parser, food_[0], 0, 20);
-        toolbox::Load(parser, food_[1], 0, 10);
-        toolbox::Load(parser, side_, (unsigned char)0, (unsigned char)4);
+        toolbox::Load(parser, food_[0], 0, 10);
+        toolbox::Load(parser, food_[1], 0, 20);
+        toolbox::Load(parser, side_, 0, 4);
         int snake_size;
         toolbox::Load(parser, snake_size, 3, CX * CY);
         for (int i = 0; i < snake_size; ++i)
@@ -62,7 +62,7 @@ main::Begin::Begin()
     catch(...)
     {
         level_ = 0;
-        lives_ = 5;
+        lives_ = 4;
         ResetSnake();
         ResetFood();
     }
@@ -74,17 +74,11 @@ main::Begin::~Begin()
     try
     {
         toolbox::Save(composer, level_);
-        toolbox::Save(composer, ' ');
         toolbox::Save(composer, lives_);
-        toolbox::Save(composer, ' ');
         toolbox::Save(composer, food_[0]);
-        toolbox::Save(composer, ' ');
         toolbox::Save(composer, food_[1]);
-        toolbox::Save(composer, ' ');
         toolbox::Save(composer, side_);
-        toolbox::Save(composer, ' ');
         toolbox::Save(composer, (int)parts_.size());
-        toolbox::Save(composer, ' ');
         for (const auto part : parts_)
         {
             toolbox::Save(composer, part[0]);

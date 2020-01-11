@@ -24,7 +24,7 @@ namespace toolbox
     template<typename T>
     void Save(std::ostream & composer, const T & value)
     {
-        composer << value;
+        composer << value << ' ';
         if (composer.fail())
             throw "";
     }
