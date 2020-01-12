@@ -3,18 +3,20 @@
 //  snake-3D
 //
 //  Created by Ali Asadpoor on 7/13/19.
-//  Copyright © 2019 Shaidin. All rights reserved.
+//  Copyright © 2020 Shaidin. All rights reserved.
 //
 
 #include <sstream>
 
 #include "../cross/core/src/main.h"
 
+#include "data.h"
 #include "game.h"
 #include "menu.h"
 
 
-PROGRESS progress_;
+main::PROGRESS main::progress_ = main::PROGRESS::MENU;
+main::Data main::data_;
 
 void life_cycle::Begin()
 {
@@ -34,31 +36,22 @@ void life_cycle::Destroy()
 
 void life_cycle::Start()
 {
-    try
-    {
-       progress_ = (PROGRESS)std::stoi(bridge::GetPreference("progress"));
-    }
-    catch (...)
-    {
-        progress_ = PROGRESS::MENU;
-    }
+    main::data_.Load();
 }
 
 void life_cycle::Stop()
 {
-    std::ostringstream composer;
-    composer << (int)progress_;
-    bridge::SetPreference("progress", composer.str().c_str());
+    main::data_.Save();
 }
 
 void life_cycle::Restart()
 {
-    switch (progress_)
+    switch (main::progress_)
     {
-        case PROGRESS::MENU:
+        case main::PROGRESS::MENU:
             core::Stage::stage_ = std::make_unique<main::Menu>();
         break;
-        case PROGRESS::GAME:
+        case main::PROGRESS::GAME:
             core::Stage::stage_ = std::make_unique<main::Game>();
         break;
     }

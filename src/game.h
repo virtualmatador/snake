@@ -3,22 +3,17 @@
 //  snake-3D
 //
 //  Created by Ali Asadpoor on 4/11/19.
-//  Copyright © 2019 Shaidin. All rights reserved.
+//  Copyright © 2020 Shaidin. All rights reserved.
 //
 
-#ifndef SRC_BEGIN_H
-#define SRC_BEGIN_H
+#ifndef SRC_GAME_H
+#define SRC_GAME_H
 
 #include <array>
-#include <list>
 #include <vector>
 
 #include "../cross/core/src/runner.h"
 
-#include "progress.h"
-
-#define CX 20
-#define CY 10
 #define FR 4
 
 namespace main
@@ -32,7 +27,6 @@ namespace main
         static const uint32_t color_border_ = 32 << 24 | 32 << 16 | 32 << 8 | 32 << 0;
         bool pause_;
         int pattern_frame_;
-        int game_frame_;
         int column_;
         int cell_;
         int border_;
@@ -42,13 +36,6 @@ namespace main
         std::vector<unsigned char> pattern_current_;
         std::vector<unsigned char> pattern_target_;
 
-        int score_;
-        int level_;
-        int lives_;
-        std::array<int, 2> food_;
-        std::list<std::array<int, 2>> parts_;
-        int side_;
-
     public:
         Game();
         ~Game();
@@ -56,8 +43,6 @@ namespace main
         void Escape() override;
         void Initial() override;
         void Step(__uint32_t* pixels) override;
-        void ResetSnake();
-        void ResetFood();
         void TouchBegin(const float x, const float y) override;
         void TouchMove(const float x, const float y) override;
         void TouchEnd(const float x, const float y) override;
@@ -72,4 +57,4 @@ namespace main
     };
 }
 
-#endif //SRC_BEGIN_H
+#endif //SRC_GAME_H

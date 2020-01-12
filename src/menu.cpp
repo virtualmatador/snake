@@ -3,7 +3,7 @@
 //  snake-3D
 //
 //  Created by Ali Asadpoor on 4/12/19.
-//  Copyright © 2019 Shaidin. All rights reserved.
+//  Copyright © 2020 Shaidin. All rights reserved.
 //
 
 #include <sstream>
@@ -12,10 +12,32 @@
 #include "../cross/core/src/helper.h"
 
 #include "menu.h"
+#include "data.h"
 
 
 main::Menu::Menu()
 {
+    handlers_["body"] = [&](const char* command, const char* info)
+    {
+        if (std::strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "ready") == 0)
+        {
+            std::ostringstream js;
+            js.str("");
+            js.clear();
+            js << "setLevel(" << data_.level_ << ")";
+            bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
+            js << "setLives(" << data_.lives_ << ")";
+            bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
+            js << "setScore(" << data_.score_ << ")";
+            bridge::CallFunction(js.str().c_str());
+        }
+    };
     handlers_["play"] = [&](const char* command, const char* info)
     {
         if (std::strlen(command) == 0)
@@ -42,18 +64,6 @@ void main::Menu::Escape()
     bridge::Exit();
 }
 
-void main::Menu::LoadInput(const char* id)
-{
-    std::ostringstream js;
-    js << "document.getElementById('" << id << "').value = '" << bridge::GetPreference(id) << "'";
-    bridge::CallFunction(js.str().c_str());
-}
-
-void main::Menu::SaveInput(const char* id, const char* value)
-{
-    bridge::SetPreference(id, value);
-}
-
 void main::Menu::Play()
 {
     progress_ = PROGRESS::GAME;
@@ -62,4 +72,6 @@ void main::Menu::Play()
 
 void main::Menu::Reset()
 {
+    data_.Reset();
+    bridge::NeedRestart();
 }

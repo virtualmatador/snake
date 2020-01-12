@@ -7,13 +7,52 @@
     <title>Snake</title>
 </head>
 <body>
-    <h1>
-        Snake
-    </h1>
-    <h2>
-        Autosteriogram Video Game
-    </h2>
-    <button onclick="play()">Play</button>
-    <button onclick="reset()">Reset</button>
+    <table>
+        <tr>
+            <td colspan="2" class="title">
+                Snake
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="title">
+                Autosteriogram Video Game
+            </td colspan="2">
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button onclick="play()">Play</button>
+            </td>
+        </tr>
+        <tr>
+            <td class="key">
+                Lives:
+            </td>
+            <td>
+                <div id="lives">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="key">
+                Level:
+            </td>
+            <td>
+                <div id="level">0</div>
+            </td>
+        </tr>
+        <tr>
+            <td class="key">
+                Score:
+            </td>
+            <td>
+                <div id="score">0</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button onclick="reset()">Reset</button>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
