@@ -23,7 +23,7 @@
 
 namespace main
 {
-    class Begin : public core::Runner {
+    class Game : public core::Runner {
     private:
         static const uint32_t color_empty_ = 0 << 24 | 0 << 16 | 0 << 8 | 0 << 0;
         static const uint32_t color_food_ = 80 << 24 | 80 << 16 | 80 << 8 | 80 << 0;
@@ -50,8 +50,8 @@ namespace main
         int side_;
 
     public:
-        Begin();
-        ~Begin();
+        Game();
+        ~Game();
 
         void Escape() override;
         void Initial() override;

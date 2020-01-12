@@ -16,19 +16,18 @@
 
 namespace main
 {
-    class Error: public core::Stage
+    class Menu: public core::Stage
     {
     public:
-        Error();
-        ~Error();
+        Menu();
+        ~Menu();
         void Escape() override;
 
     private:
         void LoadInput(const char* id);
         void SaveInput(const char* id, const char* value);
-        void Retry();
-        void Https();
-        void Response(const char* response);
+        void Play();
+        void Reset();
     };
 }
 

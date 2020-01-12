@@ -14,8 +14,8 @@
 
 enum class PROGRESS : __int32_t
 {
-    BEGIN,
-    ERROR,
+    MENU,
+    GAME,
 };
 
 extern PROGRESS progress_;

@@ -14,10 +14,10 @@
 
 #include "toolbox.hpp"
 
-#include "begin.h"
+#include "game.h"
 
 
-main::Begin::Begin()
+main::Game::Game()
     : core::Runner(
         (__int32_t)core::VIEW_INFO::Landscape |
         (__int32_t)core::VIEW_INFO::ScreenOn |
@@ -33,7 +33,7 @@ main::Begin::Begin()
     std::srand(time(NULL));
     frame_lenght_ = std::operator""ms((unsigned long long)50);
     std::istringstream parser;
-    parser.str(bridge::GetPreference("Begin"));
+    parser.str(bridge::GetPreference("GAME"));
     try
     {
         toolbox::Load(parser, level_, 0, 5);
@@ -68,7 +68,7 @@ main::Begin::Begin()
     }
 }
 
-main::Begin::~Begin()
+main::Game::~Game()
 {
     std::ostringstream composer;
     try
@@ -88,16 +88,16 @@ main::Begin::~Begin()
     catch(...)
     {
     }
-    bridge::SetPreference("Begin", composer.str().c_str());
+    bridge::SetPreference("GAME", composer.str().c_str());
 }
 
-void main::Begin::Escape()
+void main::Game::Escape()
 {
-    progress_ = PROGRESS::ERROR;
+    progress_ = PROGRESS::MENU;
     bridge::NeedRestart();
 }
 
-void main::Begin::Initial()
+void main::Game::Initial()
 {
     column_ = dpi_ / 2;
     cell_ = std::min((width_ - column_ * 2) / (CX + 1), height_ / (CY + 1));
@@ -109,7 +109,7 @@ void main::Begin::Initial()
     pattern_base_.resize(pattern_target_.size());
 }
 
-void main::Begin::Step(__uint32_t* pixels)
+void main::Game::Step(__uint32_t* pixels)
 {
     if (!pause_)
     {
@@ -128,7 +128,7 @@ void main::Begin::Step(__uint32_t* pixels)
     steriogram::Convert<4, 16>((unsigned char*)pixels, column_, width_, height_, pattern_current_.data());
 }
 
-void main::Begin::ResetSnake()
+void main::Game::ResetSnake()
 {
     side_ = 1;
     parts_.clear();
@@ -137,7 +137,7 @@ void main::Begin::ResetSnake()
     parts_.push_back({CY / 2, 1});
 }
 
-void main::Begin::ResetFood()
+void main::Game::ResetFood()
 {
     int food = std::rand() % (CY * CX - parts_.size());
     for (food_[0] = 0; food_[0] < CY; ++food_[0])
@@ -159,17 +159,17 @@ void main::Begin::ResetFood()
     }
 }
 
-void main::Begin::TouchBegin(const float x, const float y)
+void main::Game::TouchBegin(const float x, const float y)
 {
     touch_[0] = y;
     touch_[1] = x;
 }
 
-void main::Begin::TouchMove(const float x, const float y)
+void main::Game::TouchMove(const float x, const float y)
 {
 }
 
-void main::Begin::TouchEnd(const float x, const float y)
+void main::Game::TouchEnd(const float x, const float y)
 {
     touch_[0] = y - touch_[0];
     touch_[1] = x - touch_[1];
@@ -218,7 +218,7 @@ void main::Begin::TouchEnd(const float x, const float y)
     }
 }
 
-bool main::Begin::Move()
+bool main::Game::Move()
 {
     auto head = parts_.front();
     switch (side_)
@@ -266,7 +266,7 @@ bool main::Begin::Move()
     return true;
 }
 
-void main::Begin::Play()
+void main::Game::Play()
 {
     if (!Move())
     {
@@ -284,7 +284,7 @@ void main::Begin::Play()
     game_frame_ = 0;
 }
 
-void main::Begin::ApplyBoard(__uint32_t *pixels)
+void main::Game::ApplyBoard(__uint32_t *pixels)
 {
     memset(pixels, color_empty_, width_ * height_ * 4);
     DrawBorder(pixels, color_border_);
@@ -294,7 +294,7 @@ void main::Begin::ApplyBoard(__uint32_t *pixels)
         DrawSquare(pixels, *it, color_tail_);
 }
 
-void main::Begin::DrawBorder(__uint32_t* pixels, const __uint32_t color)
+void main::Game::DrawBorder(__uint32_t* pixels, const __uint32_t color)
 {
     for (int i = margin_[0]; i < margin_[0] + border_; ++i)
         for (int j = margin_[1]; j < margin_[1] + cell_ * CX + border_ * 2; ++j)
@@ -311,7 +311,7 @@ void main::Begin::DrawBorder(__uint32_t* pixels, const __uint32_t color)
             pixels[i * width_ + j] = color;    
 }
 
-void main::Begin::DrawSquare(__uint32_t* pixels, const std::array<int, 2> & target, const __uint32_t color)
+void main::Game::DrawSquare(__uint32_t* pixels, const std::array<int, 2> & target, const __uint32_t color)
 {
     for (int i = margin_[0] + border_ + target[0] * cell_; i < margin_[0] + border_ + cell_ + target[0] * cell_; ++i)
         for (int j = margin_[1] + border_ + target[1] * cell_; j < margin_[1] + border_ + cell_ + target[1] * cell_; ++j)

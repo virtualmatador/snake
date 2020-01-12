@@ -10,8 +10,8 @@
 
 #include "../cross/core/src/main.h"
 
-#include "begin.h"
-#include "error.h"
+#include "game.h"
+#include "menu.h"
 
 
 PROGRESS progress_;
@@ -40,7 +40,7 @@ void life_cycle::Start()
     }
     catch (...)
     {
-        progress_ = PROGRESS::BEGIN;
+        progress_ = PROGRESS::MENU;
     }
 }
 
@@ -55,11 +55,11 @@ void life_cycle::Restart()
 {
     switch (progress_)
     {
-        case PROGRESS::BEGIN:
-            core::Stage::stage_ = std::make_unique<main::Begin>();
+        case PROGRESS::MENU:
+            core::Stage::stage_ = std::make_unique<main::Menu>();
         break;
-        case PROGRESS::ERROR:
-            core::Stage::stage_ = std::make_unique<main::Error>();
+        case PROGRESS::GAME:
+            core::Stage::stage_ = std::make_unique<main::Game>();
         break;
     }
 }
