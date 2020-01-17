@@ -34,9 +34,10 @@ namespace main
         int level_;
         int score_;
         int frame_;
+        int side_;
+        bool sound_;
         std::array<int, 2> food_;
         std::list<std::array<int, 2>> parts_;
-        int side_;
     };
 
     extern Data data_;

@@ -20,21 +20,22 @@ void main::Data::Load()
     parser.str(bridge::GetPreference("GAME"));
     try
     {
-        toolbox::Load(parser, lives_, 0, 6);
-        toolbox::Load(parser, level_, 1, 11);
-        toolbox::Load(parser, score_, 0, 10001);
-        toolbox::Load(parser, frame_, 0, MAX_FRAME - level_);
-        toolbox::Load(parser, food_[0], 0, 10);
-        toolbox::Load(parser, food_[1], 0, 20);
-        toolbox::Load(parser, side_, 0, 4);
+        toolbox::Load(parser, lives_, 0, 5);
+        toolbox::Load(parser, level_, 1, 10);
+        toolbox::Load(parser, score_, 0, 10000);
+        toolbox::Load(parser, frame_, 0, MAX_FRAME - level_ - 1);
+        toolbox::Load(parser, side_, 0, 3);
+        toolbox::Load(parser, sound_, false, true);
+        toolbox::Load(parser, food_[0], 0, 9);
+        toolbox::Load(parser, food_[1], 0, 19);
         int snake_size;
-        toolbox::Load(parser, snake_size, 3, CX * CY);
+        toolbox::Load(parser, snake_size, 3, CX * CY - 1);
         parts_.clear();
         for (int i = 0; i < snake_size; ++i)
         {
             decltype(parts_)::value_type part;
-            toolbox::Load(parser, part[0], 0, 10);
-            toolbox::Load(parser, part[1], 0, 20);
+            toolbox::Load(parser, part[0], 0, 9);
+            toolbox::Load(parser, part[1], 0, 19);
             parts_.push_back(part);
         }
         for (auto left_it = parts_.begin(); left_it != parts_.end(); ++left_it)
@@ -63,9 +64,10 @@ void main::Data::Save()
         toolbox::Save(composer, level_);
         toolbox::Save(composer, score_);
         toolbox::Save(composer, frame_);
+        toolbox::Save(composer, side_);
+        toolbox::Save(composer, sound_);
         toolbox::Save(composer, food_[0]);
         toolbox::Save(composer, food_[1]);
-        toolbox::Save(composer, side_);
         toolbox::Save(composer, (int)parts_.size());
         for (const auto part : parts_)
         {
@@ -86,6 +88,7 @@ void main::Data::Reset()
     level_ = 1;
     score_ = 0;
     frame_ = 0;
+    sound_ = true;
     ResetSnake();
     ResetFood();
 }

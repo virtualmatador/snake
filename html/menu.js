@@ -23,3 +23,13 @@ function setScore(score)
 {
     document.getElementById("score").innerText = score;
 }
+
+function setSound(sound)
+{
+    document.getElementById("sound").checked = sound;
+}
+
+function sound()
+{
+    CallHandler("sound", "click", document.getElementById("sound").checked);
+}

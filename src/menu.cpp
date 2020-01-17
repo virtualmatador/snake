@@ -36,6 +36,10 @@ main::Menu::Menu()
             js.clear();
             js << "setScore(" << data_.score_ << ")";
             bridge::CallFunction(js.str().c_str());
+            js.str("");
+            js.clear();
+            js << "setSound(" << data_.sound_ << ")";
+            bridge::CallFunction(js.str().c_str());
         }
     };
     handlers_["play"] = [&](const char* command, const char* info)
@@ -51,6 +55,20 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
             Reset();
+    };
+    handlers_["sound"] = [&](const char* command, const char* info)
+    {
+        if (std::strlen(command) == 0)
+            return;
+        else if (std::strcmp(command, "click") == 0)
+        {
+            if (std::strlen(info) == 0)
+                return;
+            else if (std::strcmp(info, "true") == 0)
+                data_.sound_ = true;
+            else if (std::strcmp(info, "false") == 0)
+                data_.sound_ = false;
+        }
     };
     bridge::LoadWebView(index_, (__int32_t)core::VIEW_INFO::Default, "menu", "");
 }

@@ -211,7 +211,8 @@ void main::Game::Play(bool turn)
         audio = 2;
         break;
     }
-    bridge::PlayAudio(audio);
+    if (data_.sound_)
+        bridge::PlayAudio(audio);
     data_.frame_ = 0;
 }
 
