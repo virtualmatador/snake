@@ -49,8 +49,8 @@ namespace main
 
     private:
 
-        bool Move();
-        void Play();
+        int Move();
+        void Play(bool turn);
         void ApplyBoard(__uint32_t* pixels);
         void DrawBorder(__uint32_t* pixels, const __uint32_t color);
         void DrawSquare(__uint32_t* pixels, const std::array<int, 2> & target, const __uint32_t color);

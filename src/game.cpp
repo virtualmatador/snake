@@ -18,7 +18,9 @@ main::Game::Game()
     : core::Runner(
         (__int32_t)core::VIEW_INFO::Landscape |
         (__int32_t)core::VIEW_INFO::ScreenOn |
-        (__int32_t)core::VIEW_INFO::CloseMenu, 480)
+        (__int32_t)core::VIEW_INFO::CloseMenu,
+        480,
+        "move turn food die")
     , pause_{true}
     , pattern_frame_{FR - 1}
     , column_{0}
@@ -57,7 +59,7 @@ void main::Game::Step(__uint32_t* pixels)
     if (!pause_)
     {
         if (++data_.frame_ >= MAX_FRAME - data_.level_)
-            Play();
+            Play(false);
     }
     if (++pattern_frame_ == FR)
     {
@@ -97,23 +99,18 @@ void main::Game::TouchEnd(const float x, const float y)
     }
     else if (!pause_)
     {
+        int side = -1;
         if (std::abs(touch_[0]) > std::abs(touch_[1]))
         {
             if (touch_[0] < 0)
             {
                 if (data_.side_ != 3)
-                {
-                    data_.side_ = 2;
-                    Play();
-                }
+                    side = 2;
             }
             else
             {
                 if (data_.side_ != 2)
-                {
-                    data_.side_ = 3;
-                    Play();
-                }
+                    side = 3;
             }
         }
         else
@@ -121,24 +118,23 @@ void main::Game::TouchEnd(const float x, const float y)
             if (touch_[1] < 0)
             {
                 if (data_.side_ != 1)
-                {
-                    data_.side_ = 0;
-                    Play();
-                }
+                    side = 0;
         }
             else
             {
                 if (data_.side_ != 0)
-                {
-                    data_.side_ = 1;
-                    Play();
-                }
+                    side = 1;
             }
+        }
+        if (side != -1)
+        {
+            data_.side_ = side;
+            Play(true);
         }
     }
 }
 
-bool main::Game::Move()
+int main::Game::Move()
 {
     auto head = data_.parts_.front();
     switch (data_.side_)
@@ -147,25 +143,25 @@ bool main::Game::Move()
         if (head[1] > 0)
             --head[1];
         else
-            return false;
+            return 0;
         break;
     case 1:
         if (head[1] < CX - 1)
             ++head[1];
         else
-            return false;
+            return 0;
         break;
     case 2:
         if (head[0] > 0)
             --head[0];
         else
-            return false;
+            return 0;
         break;
     case 3:
         if (head[0] < CY - 1)
             ++head[0];
         else
-            return false;
+            return 0;
         break;
     }
     if (head == data_.food_)
@@ -178,6 +174,7 @@ bool main::Game::Move()
         }
         data_.parts_.push_front(head);
         data_.ResetFood();
+        return 2;
     }
     else
     {
@@ -188,21 +185,33 @@ bool main::Game::Move()
                 return false;
         }
         data_.parts_.push_front(head);
+        return 1;
     }
-    return true;
+    return -1;
 }
 
-void main::Game::Play()
+void main::Game::Play(bool turn)
 {
-    if (!Move())
+    int audio;
+    switch (Move())
     {
+    case 0:
         pause_ = true;
         if (--data_.lives_ > 0)
         {
             data_.ResetSnake();
             data_.ResetFood();
         }
+        audio = 3;
+        break;
+    case 1:
+        audio = turn ? 1 : 0;
+        break;
+    case 2:
+        audio = 2;
+        break;
     }
+    bridge::PlayAudio(audio);
     data_.frame_ = 0;
 }
 

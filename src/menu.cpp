@@ -52,7 +52,7 @@ main::Menu::Menu()
         else if (std::strcmp(command, "click") == 0)
             Reset();
     };
-    bridge::LoadWebView(index_, (__int32_t)core::VIEW_INFO::Default, "menu");
+    bridge::LoadWebView(index_, (__int32_t)core::VIEW_INFO::Default, "menu", "");
 }
 
 main::Menu::~Menu()
