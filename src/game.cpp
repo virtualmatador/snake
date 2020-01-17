@@ -20,7 +20,7 @@ main::Game::Game()
         (__int32_t)core::VIEW_INFO::ScreenOn |
         (__int32_t)core::VIEW_INFO::CloseMenu,
         480,
-        "move turn food die")
+        "move turn food die win")
     , pause_{true}
     , pattern_frame_{FR - 1}
     , column_{0}
@@ -45,10 +45,10 @@ void main::Game::Escape()
 void main::Game::Initial()
 {
     column_ = dpi_ / 2;
-    cell_ = std::min((width_ - column_ * 2) / (CX + 1), height_ / (CY + 1));
+    cell_ = std::min((width_ - column_ * 2) / (data_.c_x_ + 1), height_ / (data_.c_y_ + 1));
     border_ = cell_ / 3;
-    margin_[0] = (height_ - cell_ * CY - border_ * 2) / 2;
-    margin_[1] = (width_ - cell_ * CX - border_ * 2) / 2;
+    margin_[0] = (height_ - cell_ * data_.c_y_ - border_ * 2) / 2;
+    margin_[1] = (width_ - cell_ * data_.c_x_ - border_ * 2) / 2;
     pattern_target_ = steriogram::CreateRandomPattern<4>(column_, order_rgba_);
     pattern_current_.resize(pattern_target_.size());
     pattern_base_.resize(pattern_target_.size());
@@ -58,7 +58,7 @@ void main::Game::Step(__uint32_t* pixels)
 {
     if (!pause_)
     {
-        if (++data_.frame_ >= MAX_FRAME - data_.level_)
+        if (++data_.frame_ == data_.GetDelay())
             Play(false);
     }
     if (++pattern_frame_ == FR)
@@ -146,7 +146,7 @@ int main::Game::Move()
             return 0;
         break;
     case 1:
-        if (head[1] < CX - 1)
+        if (head[1] < data_.c_x_ - 1)
             ++head[1];
         else
             return 0;
@@ -158,7 +158,7 @@ int main::Game::Move()
             return 0;
         break;
     case 3:
-        if (head[0] < CY - 1)
+        if (head[0] < data_.c_y_ - 1)
             ++head[0];
         else
             return 0;
@@ -167,13 +167,10 @@ int main::Game::Move()
     if (head == data_.food_)
     {
         data_.score_ += data_.parts_.size();
-        if (data_.score_ > data_.level_ * 1000)
-        {
-            if (data_.level_ < 10)
-                ++data_.level_;
-        }
         data_.parts_.push_front(head);
         data_.ResetFood();
+        if (++data_.eat_ == data_.eat_max_)
+            return 3;
         return 2;
     }
     else
@@ -198,10 +195,7 @@ void main::Game::Play(bool turn)
     case 0:
         pause_ = true;
         if (--data_.lives_ > 0)
-        {
-            data_.ResetSnake();
-            data_.ResetFood();
-        }
+            data_.ResetSnakeFood();
         audio = 3;
         break;
     case 1:
@@ -209,6 +203,12 @@ void main::Game::Play(bool turn)
         break;
     case 2:
         audio = 2;
+        break;
+    case 3:
+        data_.score_ = data_.score_ * (data_.lives_max_ + 1) / (data_.lives_max_ + 1 - data_.lives_);
+        data_.lives_ = 0;
+        pause_ = true;
+        audio = 4;
         break;
     }
     if (data_.sound_)
@@ -229,17 +229,17 @@ void main::Game::ApplyBoard(__uint32_t *pixels)
 void main::Game::DrawBorder(__uint32_t* pixels, const __uint32_t color)
 {
     for (int i = margin_[0]; i < margin_[0] + border_; ++i)
-        for (int j = margin_[1]; j < margin_[1] + cell_ * CX + border_ * 2; ++j)
+        for (int j = margin_[1]; j < margin_[1] + cell_ * data_.c_x_ + border_ * 2; ++j)
             pixels[i * width_ + j] = color;
-    for (int i = margin_[0] + border_; i < margin_[0] + border_ +  cell_ * CY; ++i)
+    for (int i = margin_[0] + border_; i < margin_[0] + border_ +  cell_ * data_.c_y_; ++i)
     {
         for (int j = margin_[1]; j < margin_[1] + border_; ++j)
             pixels[i * width_ + j] = color;
-        for (int j = margin_[1] + cell_ * CX + border_; j < margin_[1] + cell_ * CX + border_ * 2; ++j)
+        for (int j = margin_[1] + cell_ * data_.c_x_ + border_; j < margin_[1] + cell_ * data_.c_x_ + border_ * 2; ++j)
             pixels[i * width_ + j] = color;
     }
-    for (int i = margin_[0] + cell_ * CY + border_; i < margin_[0] + cell_ * CY + 2 * border_; ++i)
-        for (int j = margin_[1]; j < margin_[1] + cell_ * CX + border_ * 2; ++j)
+    for (int i = margin_[0] + cell_ * data_.c_y_ + border_; i < margin_[0] + cell_ * data_.c_y_ + 2 * border_; ++i)
+        for (int j = margin_[1]; j < margin_[1] + cell_ * data_.c_x_ + border_ * 2; ++j)
             pixels[i * width_ + j] = color;    
 }
 

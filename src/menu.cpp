@@ -26,7 +26,7 @@ main::Menu::Menu()
             std::ostringstream js;
             js.str("");
             js.clear();
-            js << "setLevel(" << data_.level_ << ")";
+            js << "setLevel(" << data_.eat_ / 100 << ")";
             bridge::CallFunction(js.str().c_str());
             js.str("");
             js.clear();
