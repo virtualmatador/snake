@@ -8,7 +8,7 @@
 
 #include <time.h>
 
-#include "steriogram/steriogram.hpp"
+#include "stereogram/stereogram.hpp"
 
 #include "game.h"
 #include "data.h"
@@ -49,7 +49,7 @@ void main::Game::Initial()
     border_ = cell_ / 3;
     margin_[0] = (height_ - cell_ * data_.c_y_ - border_ * 2) / 2;
     margin_[1] = (width_ - cell_ * data_.c_x_ - border_ * 2) / 2;
-    pattern_target_ = steriogram::CreateRandomPattern<4>(column_, order_rgba_);
+    pattern_target_ = stereogram::CreateRandomPattern<4>(column_, order_rgba_);
     pattern_current_.resize(pattern_target_.size());
     pattern_base_.resize(pattern_target_.size());
 }
@@ -64,13 +64,13 @@ void main::Game::Step(__uint32_t* pixels)
     if (++pattern_frame_ == FR)
     {
         std::swap(pattern_base_, pattern_target_);
-        pattern_target_ = steriogram::CreateRandomPattern<4>(column_, order_rgba_);
+        pattern_target_ = stereogram::CreateRandomPattern<4>(column_, order_rgba_);
         pattern_frame_ = 0;
     }
     for (int i = 0; i < pattern_current_.size(); ++i)
         pattern_current_[i] = ((int) pattern_target_[i] * pattern_frame_ + (int) pattern_base_[i] * (FR - pattern_frame_)) / FR;
     ApplyBoard(pixels);
-    steriogram::Convert<4, 16>((unsigned char*)pixels, column_, width_, height_, pattern_current_.data());
+    stereogram::Convert<4, 16>((unsigned char*)pixels, column_, width_, height_, pattern_current_.data());
 }
 
 void main::Game::TouchBegin(const float x, const float y)

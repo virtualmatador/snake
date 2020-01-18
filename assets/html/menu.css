@@ -13,8 +13,8 @@ td
 {
     margin-left: 2pt;
     margin-right: 2pt;
-    width: 2em;
-    height: 2em;
+    width: 1em;
+    height: 1em;
     background-image: url("menu/heart.png");
     background-repeat: no-repeat;
     background-size: contain;
@@ -23,17 +23,16 @@ td
 
 #lives
 {
-    min-width: 12em;
+    min-width: 6em;
 }
 
 .title
 {
-    padding-top: 6pt;
     font-size: larger;
     font-weight: bold;
 }
 
-.title
+button
 {
-    font-size: large;
+    width: 8em;
 }

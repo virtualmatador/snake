@@ -31,5 +31,5 @@ function setSound(sound)
 
 function sound()
 {
-    CallHandler("sound", "click", document.getElementById("sound").checked);
+    CallHandler("sound", "click", document.getElementById("sound").checked.toString());
 }
