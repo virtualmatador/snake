@@ -1,6 +1,12 @@
-[submodule "cross"]
-	path = cross
-	url = ../cross-platform
 [submodule "src/steriogram"]
 	path = src/steriogram
 	url = ../steriogram
+[submodule "cross/core"]
+	path = cross/core
+	url = ../cross-core
+[submodule "cross/android"]
+	path = cross/android
+	url = ../cross-android
+[submodule "cross/ios"]
+	path = cross/ios
+	url = ../cross-ios
