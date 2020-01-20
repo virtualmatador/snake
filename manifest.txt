@@ -1,5 +1,5 @@
 cross_target=Snake
 cross_identifier=com.shaidin.snake
 cross_version=1.0
-cross_release=2
+cross_release=4
 cross_internet=true
