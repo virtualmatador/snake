@@ -33,7 +33,7 @@ void main::Data::Load()
         toolbox::Load(parser, eat_, 0, eat_max_);
         toolbox::Load(parser, score_, 0, score_max_);
         toolbox::Load(parser, frame_, 0, GetDelay() - 1);
-        toolbox::Load(parser, side_, 0, 3);
+        toolbox::Load(parser, side_, -2, 2);
         toolbox::Load(parser, sound_, false, true);
         toolbox::Load(parser, food_[0], 0, c_y_ - 1);
         toolbox::Load(parser, food_[1], 0, c_x_ - 1);
@@ -103,7 +103,7 @@ void main::Data::Reset()
 
 void main::Data::ResetSnakeFood()
 {
-    side_ = 1;
+    side_ = 2;
     parts_.clear();
     parts_.push_back({c_y_ / 2, 3});
     parts_.push_back({c_y_ / 2, 2});

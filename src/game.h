@@ -53,7 +53,9 @@ namespace main
         void Play(bool turn);
         void ApplyBoard(__uint32_t* pixels);
         void DrawBorder(__uint32_t* pixels, const __uint32_t color);
-        void DrawSquare(__uint32_t* pixels, const std::array<int, 2> & target, const __uint32_t color);
+        void DrawFood(__uint32_t* pixels);
+        void DrawHead(__uint32_t* pixels);
+        void DrawTail(__uint32_t* pixels, const std::array<int, 2> & tail, const int side);
     };
 }
 

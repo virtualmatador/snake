@@ -19,7 +19,7 @@ main::Game::Game()
         (__int32_t)core::VIEW_INFO::Landscape |
         (__int32_t)core::VIEW_INFO::ScreenOn |
         (__int32_t)core::VIEW_INFO::CloseMenu,
-        480,
+        640,
         "move turn food die win")
     , pause_{true}
     , pattern_frame_{FR - 1}
@@ -99,34 +99,34 @@ void main::Game::TouchEnd(const float x, const float y)
     }
     else if (!pause_)
     {
-        int side = -1;
+        int side = 0;
         if (std::abs(touch_[0]) > std::abs(touch_[1]))
         {
             if (touch_[0] < 0)
             {
-                if (data_.side_ != 3)
-                    side = 2;
+                if (data_.side_ != 1)
+                    side = -1;
             }
             else
             {
-                if (data_.side_ != 2)
-                    side = 3;
+                if (data_.side_ != -1)
+                    side = 1;
             }
         }
         else
         {
             if (touch_[1] < 0)
             {
-                if (data_.side_ != 1)
-                    side = 0;
-        }
+                if (data_.side_ != 2)
+                    side = -2;
+            }
             else
             {
-                if (data_.side_ != 0)
-                    side = 1;
+                if (data_.side_ != -2)
+                    side = 2;
             }
         }
-        if (side != -1)
+        if (side != 0)
         {
             data_.side_ = side;
             Play(true);
@@ -139,27 +139,27 @@ int main::Game::Move()
     auto head = data_.parts_.front();
     switch (data_.side_)
     {
-    case 0:
-        if (head[1] > 0)
-            --head[1];
-        else
-            return 0;
-        break;
-    case 1:
-        if (head[1] < data_.c_x_ - 1)
-            ++head[1];
-        else
-            return 0;
-        break;
-    case 2:
+    case -1:
         if (head[0] > 0)
             --head[0];
         else
             return 0;
         break;
-    case 3:
+    case 1:
         if (head[0] < data_.c_y_ - 1)
             ++head[0];
+        else
+            return 0;
+        break;
+    case -2:
+        if (head[1] > 0)
+            --head[1];
+        else
+            return 0;
+        break;
+    case 2:
+        if (head[1] < data_.c_x_ - 1)
+            ++head[1];
         else
             return 0;
         break;
@@ -220,10 +220,14 @@ void main::Game::ApplyBoard(__uint32_t *pixels)
 {
     memset(pixels, color_empty_, width_ * height_ * 4);
     DrawBorder(pixels, color_border_);
-    DrawSquare(pixels, data_.food_, color_food_);
-    DrawSquare(pixels, data_.parts_.front(), color_head_);
-    for (auto it = std::next(data_.parts_.begin()); it != data_.parts_.end(); ++it)
-        DrawSquare(pixels, *it, color_tail_);
+    auto it_pre = data_.parts_.begin();
+    for (auto it = std::next(it_pre); it != data_.parts_.end(); ++it)
+    {
+        DrawTail(pixels, *it_pre, (*it)[0] - (*it_pre)[0] + 2 * ((*it)[1] - (*it_pre)[1]));
+        it_pre = it;
+    }
+    DrawHead(pixels);
+    DrawFood(pixels);
 }
 
 void main::Game::DrawBorder(__uint32_t* pixels, const __uint32_t color)
@@ -243,9 +247,40 @@ void main::Game::DrawBorder(__uint32_t* pixels, const __uint32_t color)
             pixels[i * width_ + j] = color;    
 }
 
-void main::Game::DrawSquare(__uint32_t* pixels, const std::array<int, 2> & target, const __uint32_t color)
+void main::Game::DrawFood(__uint32_t* pixels)
 {
-    for (int i = margin_[0] + border_ + target[0] * cell_; i < margin_[0] + border_ + cell_ + target[0] * cell_; ++i)
-        for (int j = margin_[1] + border_ + target[1] * cell_; j < margin_[1] + border_ + cell_ + target[1] * cell_; ++j)
-            pixels[i * width_ + j] = color;
+    int center[2];
+    center[0] = margin_[0] + border_ + data_.food_[0] * cell_ + cell_ / 2;
+    center[1] = margin_[1] + border_ + data_.food_[1] * cell_ + cell_ / 2;
+    for (int i = margin_[0] + border_ + data_.food_[0] * cell_ - 1; i < margin_[0] + border_ + cell_ + data_.food_[0] * cell_ + 2; ++i)
+        for (int j = margin_[1] + border_ + data_.food_[1] * cell_ - 1; j < margin_[1] + border_ + cell_ + data_.food_[1] * cell_ + 2; ++j)
+            if (std::pow((i - center[0]) * (i - center[0]) + (j - center[1]) * (j - center[1]), 0.5) < cell_ / 2 + 1)
+                pixels[i * width_ + j] = color_food_;
+}
+
+void main::Game::DrawHead(__uint32_t* pixels)
+{
+    for (int i = margin_[0] + border_ + data_.parts_.front()[0] * cell_; i < margin_[0] + border_ + cell_ + data_.parts_.front()[0] * cell_; ++i)
+        for (int j = margin_[1] + border_ + data_.parts_.front()[1] * cell_; j < margin_[1] + border_ + cell_ + data_.parts_.front()[1] * cell_; ++j)
+            pixels[i * width_ + j] = color_head_;
+}
+
+void main::Game::DrawTail(__uint32_t* pixels, const std::array<int, 2> & tail, const int side)
+{
+    int extra[2];
+    extra[std::abs(side) - 1] = cell_ / 4 + 1;
+    extra[2 - std::abs(side)] = 0;
+    int margin[2];
+    margin[std::abs(side) - 1] = cell_;
+    margin[2 - std::abs(side)] = cell_ / 4 + 1;
+    int center[2];
+    center[0] = margin_[0] + border_ + tail[0] * cell_ + cell_ / 2;
+    center[1] = margin_[1] + border_ + tail[1] * cell_ + cell_ / 2;
+    int left = center[1] - (side != 2) * margin[1] - extra[1];
+    int right = center[1] + (side != -2) * margin[1] + extra[1];
+    int top = center[0] - (side != 1) * margin[0] - extra[0];
+    int bottom = center[0] + (side != -1) * margin[0] + extra[0];
+    for (int i = top; i <= bottom; ++i)
+        for (int j = left; j <= right; ++j)
+            pixels[i * width_ + j] = color_tail_;
 }
