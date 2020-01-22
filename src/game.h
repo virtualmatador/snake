@@ -26,6 +26,7 @@ namespace main
         static const uint32_t color_tail_ = 48 << 24 | 48 << 16 | 48 << 8 | 48 << 0;
         static const uint32_t color_border_ = 32 << 24 | 32 << 16 | 32 << 8 | 32 << 0;
         bool pause_;
+        int frame_;
         int pattern_frame_;
         int column_;
         int cell_;

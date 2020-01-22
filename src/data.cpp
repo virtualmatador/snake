@@ -15,6 +15,8 @@
 
 #include "toolbox.hpp"
 
+main::Data main::data_;
+
 const int main::Data::lives_max_;
 const int main::Data::frame_max_;
 const int main::Data::eat_max_;
@@ -25,26 +27,31 @@ const int main::Data::c_x_;
 
 void main::Data::Load()
 {
-    std::istringstream parser;
-    parser.str(bridge::GetPreference("GAME"));
     try
     {
-        toolbox::Load(parser, lives_, 0, lives_max_);
-        toolbox::Load(parser, eat_, 0, eat_max_);
-        toolbox::Load(parser, score_, 0, score_max_);
-        toolbox::Load(parser, frame_, 0, GetDelay() - 1);
-        toolbox::Load(parser, side_, -2, 2);
-        toolbox::Load(parser, sound_, false, true);
-        toolbox::Load(parser, food_[0], 0, c_y_ - 1);
-        toolbox::Load(parser, food_[1], 0, c_x_ - 1);
+        toolbox::Load("GAME_LIVES", lives_, 0, lives_max_);
+        toolbox::Load("GAME_EAT", eat_, 0, eat_max_);
+        toolbox::Load("GAME_SCORE", score_, 0, score_max_);
+        toolbox::Load("GAME_SIDE", side_, -2, 2);
+        toolbox::Load("GAME_SOUND", sound_, false, true);
+        toolbox::Load("GAME_FOOD_Y", food_[0], 0, c_y_ - 1);
+        toolbox::Load("GAME_FOOD_X", food_[1], 0, c_x_ - 1);
         int snake_size;
-        toolbox::Load(parser, snake_size, 3, c_x_ * c_y_ - 1);
+        toolbox::Load("GAME_SNAKE_SIZE", snake_size, 3, c_x_ * c_y_ - 1);
         parts_.clear();
         for (int i = 0; i < snake_size; ++i)
         {
             decltype(parts_)::value_type part;
-            toolbox::Load(parser, part[0], 0, c_y_ - 1);
-            toolbox::Load(parser, part[1], 0, c_x_ - 1);
+            {
+                std::ostringstream composer;
+                composer << "GAME_SNAKE_Y_" << i;
+                toolbox::Load(composer.str().c_str(), part[0], 0, c_y_ - 1);
+            }
+            {
+                std::ostringstream composer;
+                composer << "GAME_SNAKE_X_" << i;
+                toolbox::Load(composer.str().c_str(), part[1], 0, c_x_ - 1);
+            }
             parts_.push_back(part);
         }
         for (auto left_it = parts_.begin(); left_it != parts_.end(); ++left_it)
@@ -52,9 +59,7 @@ void main::Data::Load()
             for (auto right_it = std::next(left_it); right_it != parts_.end(); ++right_it)
             {
                 if (*left_it == *right_it)
-                {
                     throw "";
-                }
             }
         }
     }
@@ -66,29 +71,29 @@ void main::Data::Load()
 
 void main::Data::Save()
 {
-    std::ostringstream composer;
-    try
+    toolbox::Save("GAME_LIVES", lives_);
+    toolbox::Save("GAME_EAT", eat_);
+    toolbox::Save("GAME_SCORE", score_);
+    toolbox::Save("GAME_SIDE", side_);
+    toolbox::Save("GAME_SOUND", sound_);
+    toolbox::Save("GAME_FOOD_Y", food_[0]);
+    toolbox::Save("GAME_FOOD_X", food_[1]);
+    toolbox::Save("GAME_SNAKE_SIZE", (int)parts_.size());
+    int i = 0;
+    for (const auto part : parts_)
     {
-        toolbox::Save(composer, lives_);
-        toolbox::Save(composer, eat_);
-        toolbox::Save(composer, score_);
-        toolbox::Save(composer, frame_);
-        toolbox::Save(composer, side_);
-        toolbox::Save(composer, sound_);
-        toolbox::Save(composer, food_[0]);
-        toolbox::Save(composer, food_[1]);
-        toolbox::Save(composer, (int)parts_.size());
-        for (const auto part : parts_)
         {
-            toolbox::Save(composer, part[0]);
-            toolbox::Save(composer, part[1]);
+            std::ostringstream composer;
+            composer << "GAME_SNAKE_Y_" << i;
+            toolbox::Save(composer.str().c_str(), part[0]);
         }
+        {
+            std::ostringstream composer;
+            composer << "GAME_SNAKE_X_" << i;
+            toolbox::Save(composer.str().c_str(), part[1]);
+        }
+         ++i;
     }
-    catch(...)
-    {
-        composer.clear();
-    }
-    bridge::SetPreference("GAME", composer.str().c_str());
 }
 
 void main::Data::Reset()
@@ -96,7 +101,6 @@ void main::Data::Reset()
     lives_ = lives_max_;
     eat_ = 0;
     score_ = 0;
-    frame_ = 0;
     sound_ = true;
     ResetSnakeFood();
 }

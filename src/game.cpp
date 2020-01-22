@@ -19,9 +19,10 @@ main::Game::Game()
         (__int32_t)core::VIEW_INFO::Landscape |
         (__int32_t)core::VIEW_INFO::ScreenOn |
         (__int32_t)core::VIEW_INFO::CloseMenu,
-        640,
+        480,
         "move turn food die win")
     , pause_{true}
+    , frame_{0}
     , pattern_frame_{FR - 1}
     , column_{0}
     , cell_{0}
@@ -58,7 +59,7 @@ void main::Game::Step(__uint32_t* pixels)
 {
     if (!pause_)
     {
-        if (++data_.frame_ == data_.GetDelay())
+        if (++frame_ == data_.GetDelay())
             Play(false);
     }
     if (++pattern_frame_ == FR)
@@ -92,7 +93,10 @@ void main::Game::TouchEnd(const float x, const float y)
         if (pause_)
         {
             if (data_.lives_ > 0)
+            {
+                frame_ = 0;
                 pause_ = false;
+            }
         }
         else
             pause_ = true;
@@ -213,7 +217,7 @@ void main::Game::Play(bool turn)
     }
     if (data_.sound_)
         bridge::PlayAudio(audio);
-    data_.frame_ = 0;
+    frame_ = 0;
 }
 
 void main::Game::ApplyBoard(__uint32_t *pixels)
@@ -252,9 +256,9 @@ void main::Game::DrawFood(__uint32_t* pixels)
     int center[2];
     center[0] = margin_[0] + border_ + data_.food_[0] * cell_ + cell_ / 2;
     center[1] = margin_[1] + border_ + data_.food_[1] * cell_ + cell_ / 2;
-    for (int i = margin_[0] + border_ + data_.food_[0] * cell_ - 1; i < margin_[0] + border_ + cell_ + data_.food_[0] * cell_ + 2; ++i)
-        for (int j = margin_[1] + border_ + data_.food_[1] * cell_ - 1; j < margin_[1] + border_ + cell_ + data_.food_[1] * cell_ + 2; ++j)
-            if (std::pow((i - center[0]) * (i - center[0]) + (j - center[1]) * (j - center[1]), 0.5) < cell_ / 2 + 1)
+    for (int i = margin_[0] + border_ + data_.food_[0] * cell_; i < margin_[0] + border_ + cell_ + data_.food_[0] * cell_; ++i)
+        for (int j = margin_[1] + border_ + data_.food_[1] * cell_; j < margin_[1] + border_ + cell_ + data_.food_[1] * cell_; ++j)
+            if (std::pow((i - center[0]) * (i - center[0]) + (j - center[1]) * (j - center[1]), 0.5) <= cell_ / 2)
                 pixels[i * width_ + j] = color_food_;
 }
 

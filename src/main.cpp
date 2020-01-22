@@ -14,9 +14,7 @@
 #include "game.h"
 #include "menu.h"
 
-
 main::PROGRESS main::progress_ = main::PROGRESS::MENU;
-main::Data main::data_;
 
 void life_cycle::Begin()
 {

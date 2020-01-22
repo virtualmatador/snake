@@ -37,7 +37,6 @@ namespace main
         int lives_;
         int eat_;
         int score_;
-        int frame_;
         int side_;
         bool sound_;
         std::array<int, 2> food_;

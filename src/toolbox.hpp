@@ -12,8 +12,9 @@
 namespace toolbox
 {
     template<typename T>
-    void Load(std::istream & parser, T & value, const T & begin, const T & end)
+    void Load(const char* key, T & value, const T & begin, const T & end)
     {
+        std::istringstream parser(bridge::GetPreference(key));
         parser >> value;
         if (parser.fail())
             throw "";
@@ -22,11 +23,11 @@ namespace toolbox
     };
 
     template<typename T>
-    void Save(std::ostream & composer, const T & value)
+    void Save(const char* key, const T & value)
     {
-        composer << value << ' ';
-        if (composer.fail())
-            throw "";
+        std::ostringstream composer;
+        composer << value;
+        bridge::SetPreference(key, composer.str().c_str());
     }
 }
 
