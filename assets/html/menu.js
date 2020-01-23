@@ -10,6 +10,7 @@ function reset()
 
 function setLives(lives)
 {
+    document.getElementById("lives").innerHTML = "";
     for (var i = 0; i < lives; ++i)
         document.getElementById("lives").appendChild(document.createElement("div"));
 }
