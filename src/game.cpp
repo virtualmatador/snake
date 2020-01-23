@@ -29,7 +29,6 @@ main::Game::Game()
     , margin_{0, 0}
     , touch_{0, 0}
 {
-    std::srand(time(NULL));
     frame_lenght_ = std::operator""ms((unsigned long long)50);
 }
 
