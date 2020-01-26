@@ -11,6 +11,7 @@
 
 #include <array>
 #include <list>
+#include <random>
 
 namespace main
 {
@@ -26,6 +27,8 @@ namespace main
         friend class Menu;
         friend class Game;
     public:
+        Data();
+        ~Data();
         void Load();
         void Save();
         void Reset();
@@ -41,6 +44,8 @@ namespace main
         bool sound_;
         std::array<int, 2> food_;
         std::list<std::array<int, 2>> parts_;
+        std::random_device seeder_;
+        std::default_random_engine random_;
     };
 
     extern Data data_;

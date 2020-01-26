@@ -25,6 +25,15 @@ const int main::Data::score_max_;
 const int main::Data::c_y_;
 const int main::Data::c_x_;
 
+main::Data::Data()
+    : random_{seeder_()}
+{
+}
+
+main::Data::~Data()
+{
+}
+
 void main::Data::Load()
 {
     try
@@ -120,7 +129,7 @@ void main::Data::ResetFood()
     if (parts_.size() == c_y_ * c_x_)
         for (int i = 0; i < c_y_ * c_x_ / 2; ++i)
             parts_.pop_front();
-    int dist = std::rand() % (c_y_ * c_x_ - parts_.size());
+    int dist = std::uniform_int_distribution<int>(0, c_y_ * c_x_ - parts_.size() - 1)(random_);
     for (food_[0] = 0; food_[0] < c_y_; ++food_[0])
     {
         for (food_[1] = 0; food_[1] < c_x_; ++food_[1])

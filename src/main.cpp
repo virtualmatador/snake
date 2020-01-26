@@ -18,7 +18,6 @@ main::PROGRESS main::progress_ = main::PROGRESS::MENU;
 
 void life_cycle::Begin()
 {
-    std::srand(time(nullptr));
 }
 
 void life_cycle::End()
