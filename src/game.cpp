@@ -6,6 +6,8 @@
 //  Copyright © 2020 Shaidin. All rights reserved.
 //
 
+#include <cstring>
+
 #include <time.h>
 
 #include "stereogram/stereogram.hpp"
@@ -29,7 +31,7 @@ main::Game::Game()
     , margin_{0, 0}
     , touch_{0, 0}
 {
-    frame_lenght_ = std::operator""ms((unsigned long long)50);
+    frame_lenght_ = std::chrono::milliseconds(50);
 }
 
 main::Game::~Game()
@@ -221,7 +223,7 @@ void main::Game::Play(bool turn)
 
 void main::Game::ApplyBoard(__uint32_t *pixels)
 {
-    memset(pixels, color_empty_, width_ * height_ * 4);
+    std::memset(pixels, color_empty_, width_ * height_ * 4);
     DrawBorder(pixels, color_border_);
     auto it_pre = data_.parts_.begin();
     for (auto it = std::next(it_pre); it != data_.parts_.end(); ++it)
