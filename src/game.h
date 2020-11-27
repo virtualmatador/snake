@@ -43,7 +43,7 @@ namespace main
 
         void Escape() override;
         void Initial() override;
-        void Step(__uint32_t* pixels) override;
+        void Step(std::uint32_t* pixels) override;
         void TouchBegin(const float x, const float y) override;
         void TouchMove(const float x, const float y) override;
         void TouchEnd(const float x, const float y) override;
@@ -52,11 +52,11 @@ namespace main
 
         int Move();
         void Play(bool turn);
-        void ApplyBoard(__uint32_t* pixels);
-        void DrawBorder(__uint32_t* pixels, const __uint32_t color);
-        void DrawFood(__uint32_t* pixels);
-        void DrawHead(__uint32_t* pixels);
-        void DrawTail(__uint32_t* pixels, const std::array<int, 2> & tail, const int side);
+        void ApplyBoard(std::uint32_t* pixels);
+        void DrawBorder(std::uint32_t* pixels, const std::uint32_t color);
+        void DrawFood(std::uint32_t* pixels);
+        void DrawHead(std::uint32_t* pixels);
+        void DrawTail(std::uint32_t* pixels, const std::array<int, 2> & tail, const int side);
     };
 }
 

@@ -13,7 +13,7 @@
 
 namespace main
 {
-    enum class PROGRESS : __int32_t
+    enum class PROGRESS : std::int32_t
     {
         MENU,
         GAME,

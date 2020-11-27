@@ -70,7 +70,7 @@ main::Menu::Menu()
                 data_.sound_ = false;
         }
     };
-    bridge::LoadWebView(index_, (__int32_t)core::VIEW_INFO::Default, "menu", "");
+    bridge::LoadWebView(index_, (std::int32_t)core::VIEW_INFO::Default, "menu", "");
 }
 
 main::Menu::~Menu()

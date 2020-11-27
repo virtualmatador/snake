@@ -18,9 +18,9 @@
 
 main::Game::Game()
     : core::Runner(
-        (__int32_t)core::VIEW_INFO::Landscape |
-        (__int32_t)core::VIEW_INFO::ScreenOn |
-        (__int32_t)core::VIEW_INFO::CloseMenu,
+        (std::int32_t)core::VIEW_INFO::Landscape |
+        (std::int32_t)core::VIEW_INFO::ScreenOn |
+        (std::int32_t)core::VIEW_INFO::CloseMenu,
         480,
         "move turn food die win")
     , pause_{true}
@@ -56,7 +56,7 @@ void main::Game::Initial()
     pattern_base_.resize(pattern_target_.size());
 }
 
-void main::Game::Step(__uint32_t* pixels)
+void main::Game::Step(std::uint32_t* pixels)
 {
     if (!pause_)
     {
@@ -221,7 +221,7 @@ void main::Game::Play(bool turn)
     frame_ = 0;
 }
 
-void main::Game::ApplyBoard(__uint32_t *pixels)
+void main::Game::ApplyBoard(std::uint32_t *pixels)
 {
     std::memset(pixels, color_empty_, width_ * height_ * 4);
     DrawBorder(pixels, color_border_);
@@ -235,7 +235,7 @@ void main::Game::ApplyBoard(__uint32_t *pixels)
     DrawFood(pixels);
 }
 
-void main::Game::DrawBorder(__uint32_t* pixels, const __uint32_t color)
+void main::Game::DrawBorder(std::uint32_t* pixels, const std::uint32_t color)
 {
     for (int i = margin_[0]; i < margin_[0] + border_; ++i)
         for (int j = margin_[1]; j < margin_[1] + cell_ * data_.c_x_ + border_ * 2; ++j)
@@ -252,7 +252,7 @@ void main::Game::DrawBorder(__uint32_t* pixels, const __uint32_t color)
             pixels[i * width_ + j] = color;    
 }
 
-void main::Game::DrawFood(__uint32_t* pixels)
+void main::Game::DrawFood(std::uint32_t* pixels)
 {
     int center[2];
     center[0] = margin_[0] + border_ + data_.food_[0] * cell_ + cell_ / 2;
@@ -263,14 +263,14 @@ void main::Game::DrawFood(__uint32_t* pixels)
                 pixels[i * width_ + j] = color_food_;
 }
 
-void main::Game::DrawHead(__uint32_t* pixels)
+void main::Game::DrawHead(std::uint32_t* pixels)
 {
     for (int i = margin_[0] + border_ + data_.parts_.front()[0] * cell_; i < margin_[0] + border_ + cell_ + data_.parts_.front()[0] * cell_; ++i)
         for (int j = margin_[1] + border_ + data_.parts_.front()[1] * cell_; j < margin_[1] + border_ + cell_ + data_.parts_.front()[1] * cell_; ++j)
             pixels[i * width_ + j] = color_head_;
 }
 
-void main::Game::DrawTail(__uint32_t* pixels, const std::array<int, 2> & tail, const int side)
+void main::Game::DrawTail(std::uint32_t* pixels, const std::array<int, 2> & tail, const int side)
 {
     int extra[2];
     extra[std::abs(side) - 1] = cell_ / 4 + 1;
