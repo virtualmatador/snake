@@ -11,9 +11,6 @@
 
 #include "../cross/core/src/stage.h"
 
-#include "progress.h"
-
-
 namespace main
 {
     class Menu: public core::Stage

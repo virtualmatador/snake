@@ -13,6 +13,7 @@
 #include "data.h"
 #include "game.h"
 #include "menu.h"
+#include "progress.h"
 
 main::PROGRESS main::progress_ = main::PROGRESS::MENU;
 

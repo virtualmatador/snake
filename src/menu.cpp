@@ -13,7 +13,7 @@
 
 #include "menu.h"
 #include "data.h"
-
+#include "progress.h"
 
 main::Menu::Menu()
 {
