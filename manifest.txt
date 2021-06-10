@@ -1,5 +1,4 @@
-cross_target=Snake
-cross_identifier=com.shaidin.snake
-cross_version=1.2
-cross_release=10
-cross_internet=false
+target=Snake
+identifier=com.shaidin.snake
+version=1.3.13
+internet=false

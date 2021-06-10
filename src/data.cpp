@@ -38,15 +38,15 @@ void main::Data::Load()
 {
     try
     {
-        toolbox::Load("GAME_LIVES", lives_, 0, lives_max_);
-        toolbox::Load("GAME_EAT", eat_, 0, eat_max_);
-        toolbox::Load("GAME_SCORE", score_, 0, score_max_);
-        toolbox::Load("GAME_SIDE", side_, -2, 2);
-        toolbox::Load("GAME_SOUND", sound_, false, true);
-        toolbox::Load("GAME_FOOD_Y", food_[0], 0, c_y_ - 1);
-        toolbox::Load("GAME_FOOD_X", food_[1], 0, c_x_ - 1);
+        toolbox::Load("GAME_LIVES", lives_, 0, lives_max_ + 1);
+        toolbox::Load("GAME_EAT", eat_, 0, eat_max_ + 1);
+        toolbox::Load("GAME_SCORE", score_, 0, score_max_ + 1);
+        toolbox::Load("GAME_SIDE", side_, -2, 3);
+        toolbox::Load("GAME_SOUND", sound_, false, false);
+        toolbox::Load("GAME_FOOD_Y", food_[0], 0, c_y_);
+        toolbox::Load("GAME_FOOD_X", food_[1], 0, c_x_);
         int snake_size;
-        toolbox::Load("GAME_SNAKE_SIZE", snake_size, 3, c_x_ * c_y_ - 1);
+        toolbox::Load("GAME_SNAKE_SIZE", snake_size, 3, c_x_ * c_y_);
         parts_.clear();
         for (int i = 0; i < snake_size; ++i)
         {
@@ -54,12 +54,12 @@ void main::Data::Load()
             {
                 std::ostringstream composer;
                 composer << "GAME_SNAKE_Y_" << i;
-                toolbox::Load(composer.str().c_str(), part[0], 0, c_y_ - 1);
+                toolbox::Load(composer.str().c_str(), part[0], 0, c_y_);
             }
             {
                 std::ostringstream composer;
                 composer << "GAME_SNAKE_X_" << i;
-                toolbox::Load(composer.str().c_str(), part[1], 0, c_x_ - 1);
+                toolbox::Load(composer.str().c_str(), part[1], 0, c_x_);
             }
             parts_.push_back(part);
         }

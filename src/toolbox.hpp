@@ -1,11 +1,3 @@
-//
-//  toolbox.h
-//  snake
-//
-//  Created by Ali Asadpoor on 7/25/19.
-//  Copyright © 2019 Shaidin. All rights reserved.
-//
-
 #ifndef SRC_TOOLBOX_H
 #define SRC_TOOLBOX_H
 
@@ -17,9 +9,14 @@ namespace toolbox
         std::istringstream parser(bridge::GetPreference(key));
         parser >> value;
         if (parser.fail())
+        {
             throw "";
-        if (value < begin || value > end)
-            throw "";
+        }
+        if constexpr (!std::is_same<T, bool>::value)
+        {
+            if (value < begin || !(value < end))
+                throw "";
+        }
     };
 
     template<typename T>
