@@ -20,7 +20,8 @@ main::Game::Game()
     : core::Runner(
         (std::int32_t)core::VIEW_INFO::Landscape |
         (std::int32_t)core::VIEW_INFO::ScreenOn |
-        (std::int32_t)core::VIEW_INFO::CloseMenu,
+        (std::int32_t)core::VIEW_INFO::CloseMenu |
+        (std::int32_t)core::VIEW_INFO::AudioNoSolo,
         480,
         "move turn food die win")
     , pause_{true}
