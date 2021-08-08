@@ -8,7 +8,7 @@
 
 #include <sstream>
 
-#include "../cross/core/src/main.h"
+#include "main.h"
 
 #include "data.h"
 #include "game.h"

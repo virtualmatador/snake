@@ -9,7 +9,7 @@
 #include <sstream>
 #include <cstring>
 
-#include "../cross/core/src/helper.h"
+#include "helper.h"
 
 #include "menu.h"
 #include "data.h"

@@ -12,7 +12,7 @@
 #include <array>
 #include <vector>
 
-#include "../cross/core/src/runner.h"
+#include "runner.h"
 
 #define FR 4
 

@@ -1,9 +1,6 @@
 [submodule "src/stereogram"]
 	path = src/stereogram
 	url = ../stereogram
-[submodule "cross/core"]
-	path = cross/core
-	url = ../cross-core
 [submodule "cross/desktop"]
 	path = cross/desktop
 	url = ../cross-desktop
