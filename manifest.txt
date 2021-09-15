@@ -2,3 +2,4 @@ target=Snake
 identifier=com.shaidin.snake
 version=1.6.14
 internet=false
+guid=D699CE39-12C2-434E-9CDD-1735FEA5A026

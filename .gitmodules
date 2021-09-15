@@ -13,3 +13,6 @@
 [submodule "cross/web"]
 	path = cross/web
 	url = ../cross-web
+[submodule "cross/windows"]
+	path = cross/windows
+	url = ../cross-windows
