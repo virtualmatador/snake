@@ -80,6 +80,11 @@ main::Menu::~Menu()
 {
 }
 
+void main::Menu::FeedUri(const char* uri, std::function<void(
+    const std::vector<unsigned char>&)>&& consume)
+{
+}
+
 void main::Menu::Escape()
 {
     bridge::Exit();

@@ -2,13 +2,12 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <meta name="viewport" content="viewport-fit=cover, initial-scale=1, user-scalable=0">
     <link rel="stylesheet" href="game.css">
     <script src="game.js" ></script>
     <title>Snake</title>
 </head>
-<body>
-    <img id="image" onresize="resizeImage()" onclick="clickImage()" ondragstart="dragStart()" ondragend="dragEnd()">
-    <img id="escape" src="close.png" onclick="escape()"></button>
+<body id="body" onresize="notifyResize('resize')" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)" onmousedown="mouseDown(event)" onmouseup="mouseUp(event)">
+    <img id="escape" src="close.png" onclick="escape()" data-show="0">
 </body>
 </html>

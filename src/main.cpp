@@ -25,6 +25,7 @@ void life_cycle::Begin()
 void life_cycle::End()
 {
     main::data_.Save();
+    core::Stage::stage_.reset();
 }
 
 void life_cycle::Create()
