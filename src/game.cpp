@@ -42,7 +42,9 @@ main::Game::Game()
 
 main::Game::~Game()
 {
+    pixels_lock_.lock();
     run_ = false;
+    pixels_lock_.unlock();
     if (worker_.joinable())
     {
         worker_.join();
@@ -100,9 +102,14 @@ void main::Game::Run(const char* dimensions)
     worker_ = std::thread([this, index = index_]()
     {
         auto frame_time = std::chrono::steady_clock::now();
-        while(run_)
+        for (;;)
         {
             auto now = std::chrono::steady_clock::now();
+            std::unique_lock<std::mutex> auto_locker{ pixels_lock_ };
+            if (!run_)
+            {
+                break;
+            }
             if (drag_ != 0)
             {
                 Turn();
@@ -117,7 +124,6 @@ void main::Game::Run(const char* dimensions)
             }
             else
             {
-                std::unique_lock<std::mutex> auto_locker{ pixels_lock_ };
                 waiter_.wait_for(auto_locker, wait);
             }
         }
@@ -190,7 +196,6 @@ void main::Game::Initial(int32_t width, int32_t height)
 
 void main::Game::Step()
 {
-    pixels_lock_.lock();
     if (++pattern_frame_ == animation_frames_)
     {
         std::swap(pattern_base_, pattern_target_);
@@ -213,7 +218,6 @@ void main::Game::Step()
     ApplyBoard((PIXEL*)bitmap);
     stereogram::Convert<bpp_, 16>(bitmap, (width_ / columns_), width_, height_,
         pattern_current_.data());
-    pixels_lock_.unlock();
 }
 
 void main::Game::Drag(const char* side)
