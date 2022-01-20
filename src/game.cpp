@@ -92,13 +92,7 @@ void main::Game::Setup()
 
 void main::Game::Run(const char* dimensions)
 {
-    std::istringstream parser(dimensions);
-    int32_t width = 0;
-    int32_t height = 0;
-    parser >> width >> height;
-    height = height * request_width_ / width;
-    width = request_width_;
-    Initial(width, height);
+    Resize(dimensions);
     worker_ = std::thread([this, index = index_]()
     {
         auto frame_time = std::chrono::steady_clock::now();
