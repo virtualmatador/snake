@@ -210,7 +210,7 @@ void main::Game::Step()
     }
     auto bitmap = &pixels_[54];
     ApplyBoard((PIXEL*)bitmap);
-    stereogram::Convert<bpp_, 16>(bitmap, (width_ / columns_), width_, height_,
+    stereogram::Convert<bpp_, 16, 1>(bitmap, (width_ / columns_), width_, height_,
         pattern_current_.data());
 }
 

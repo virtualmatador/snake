@@ -26,11 +26,11 @@ namespace main
     private:
         static inline const int32_t bpp_ = 4;
         using PIXEL = std::array<unsigned char, bpp_>;
-        static inline const PIXEL color_empty_ = {0, 0, 0, 255};
-        static inline const PIXEL color_food_ = {80, 80, 80, 255};
-        static inline const PIXEL color_head_ = {64, 64, 64, 255};
-        static inline const PIXEL color_tail_ = {48, 48, 48, 255};
-        static inline const PIXEL color_border_ = {32, 32, 32, 255};
+        static inline const PIXEL color_empty_ = {16, 16, 16, 255};
+        static inline const PIXEL color_food_ = {64, 64, 64, 255};
+        static inline const PIXEL color_head_ = {48, 48, 48, 255};
+        static inline const PIXEL color_tail_ = {32, 32, 32, 255};
+        static inline const PIXEL color_border_ = {0, 0, 0, 255};
         static inline const int32_t request_width_ = 480;
         static inline const int32_t columns_ = 10;
         static inline const int32_t animation_frames_ = 4;
