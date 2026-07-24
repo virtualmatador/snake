@@ -182,9 +182,8 @@ void main::Game::Initial(int32_t width, int32_t height)
     pattern_base_.resize(pattern_target_.size());
     cell_ = std::min((width_ - (width_ / columns_) * 2) / (data_.c_x_ + 1),
         height_ / (data_.c_y_ + 1));
-    border_ = cell_ / 3;
-    margin_[0] = (height_ - cell_ * data_.c_y_ - border_ * 2) / 2;
-    margin_[1] = (width_ - cell_ * data_.c_x_ - border_ * 2) / 2;
+    margin_[0] = (height_ - cell_ * data_.c_y_) / 2;
+    margin_[1] = (width_ - cell_ * data_.c_x_) / 2;
     pixels_lock_.unlock();
 }
 
@@ -210,7 +209,7 @@ void main::Game::Step()
     }
     auto bitmap = &pixels_[54];
     ApplyBoard((PIXEL*)bitmap);
-    stereogram::Convert<bpp_, 16, 1>(bitmap, (width_ / columns_), width_, height_,
+    stereogram::Convert<bpp_>(bitmap, (width_ / columns_), width_, height_, 1,
         pattern_current_.data());
 }
 
@@ -386,10 +385,10 @@ void main::Game::ApplyBoard(PIXEL* pixels)
     {
         for (int j = 0; j < width_; j++)
         {
-            pixels[i * width_ + j] = color_empty_;
+            pixels[i * width_ + j] = color_background_;
         }
     }
-    DrawBorder(pixels);
+    DrawBoard(pixels);
     auto it_pre = data_.parts_.begin();
     for (auto it = std::next(it_pre); it != data_.parts_.end(); ++it)
     {
@@ -401,37 +400,22 @@ void main::Game::ApplyBoard(PIXEL* pixels)
     DrawFood(pixels);
 }
 
-void main::Game::DrawBorder(PIXEL* pixels)
+void main::Game::DrawBoard(PIXEL* pixels)
 {
-    for (int i = margin_[0]; i < margin_[0] + border_; ++i)
-        for (int j = margin_[1];
-            j < margin_[1] + cell_ * data_.c_x_ + border_ * 2; ++j)
-            pixels[i * width_ + j] = color_border_;
-    for (int i = margin_[0] + border_;
-        i < margin_[0] + border_ +  cell_ * data_.c_y_; ++i)
-    {
-        for (int j = margin_[1]; j < margin_[1] + border_; ++j)
-            pixels[i * width_ + j] = color_border_;
-        for (int j = margin_[1] + cell_ * data_.c_x_ + border_;
-            j < margin_[1] + cell_ * data_.c_x_ + border_ * 2; ++j)
-            pixels[i * width_ + j] = color_border_;
-    }
-    for (int i = margin_[0] + cell_ * data_.c_y_ + border_;
-        i < margin_[0] + cell_ * data_.c_y_ + 2 * border_; ++i)
-        for (int j = margin_[1];
-            j < margin_[1] + cell_ * data_.c_x_ + border_ * 2; ++j)
-            pixels[i * width_ + j] = color_border_;
+    for (int i = margin_[0]; i < margin_[0] + cell_ * data_.c_y_; ++i)
+        for (int j = margin_[1]; j < margin_[1] + cell_ * data_.c_x_; ++j)
+            pixels[i * width_ + j] = color_board_;
 }
 
 void main::Game::DrawFood(PIXEL* pixels)
 {
     int center[2];
-    center[0] = margin_[0] + border_ + data_.food_[0] * cell_ + cell_ / 2;
-    center[1] = margin_[1] + border_ + data_.food_[1] * cell_ + cell_ / 2;
-    for (int i = margin_[0] + border_ + data_.food_[0] * cell_;
-        i < margin_[0] + border_ + cell_ + data_.food_[0] * cell_; ++i)
-        for (int j = margin_[1] + border_ + data_.food_[1] * cell_;
-            j < margin_[1] + border_ + cell_ + data_.food_[1] * cell_; ++j)
+    center[0] = margin_[0] + data_.food_[0] * cell_ + cell_ / 2;
+    center[1] = margin_[1] + data_.food_[1] * cell_ + cell_ / 2;
+    for (int i = margin_[0] + data_.food_[0] * cell_;
+        i < margin_[0] + cell_ + data_.food_[0] * cell_; ++i)
+        for (int j = margin_[1] + data_.food_[1] * cell_;
+            j < margin_[1] + cell_ + data_.food_[1] * cell_; ++j)
             if (std::pow((i - center[0]) * (i - center[0]) +
                 (j - center[1]) * (j - center[1]), 0.5) <= cell_ / 2)
                 pixels[i * width_ + j] = color_food_;
@@ -439,10 +423,10 @@ void main::Game::DrawFood(PIXEL* pixels)
 
 void main::Game::DrawHead(PIXEL* pixels)
 {
-    for (int i = margin_[0] + border_ + data_.parts_.front()[0] * cell_;
-        i < margin_[0] + border_ + cell_ + data_.parts_.front()[0] * cell_; ++i)
-        for (int j = margin_[1] + border_ + data_.parts_.front()[1] * cell_;
-            j < margin_[1] + border_ + cell_ + data_.parts_.front()[1] * cell_;
+    for (int i = margin_[0] + data_.parts_.front()[0] * cell_;
+        i < margin_[0] + cell_ + data_.parts_.front()[0] * cell_; ++i)
+        for (int j = margin_[1] + data_.parts_.front()[1] * cell_;
+            j < margin_[1] + cell_ + data_.parts_.front()[1] * cell_;
             ++j)
             pixels[i * width_ + j] = color_head_;
 }
@@ -457,8 +441,8 @@ void main::Game::DrawTail(
     margin[std::abs(side) - 1] = cell_;
     margin[2 - std::abs(side)] = cell_ / 4 + 1;
     int center[2];
-    center[0] = margin_[0] + border_ + tail[0] * cell_ + cell_ / 2;
-    center[1] = margin_[1] + border_ + tail[1] * cell_ + cell_ / 2;
+    center[0] = margin_[0] + tail[0] * cell_ + cell_ / 2;
+    center[1] = margin_[1] + tail[1] * cell_ + cell_ / 2;
     int left = center[1] - (side != 2) * margin[1] - extra[1];
     int right = center[1] + (side != -2) * margin[1] + extra[1];
     int top = center[0] - (side != 1) * margin[0] - extra[0];

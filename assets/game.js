@@ -6,35 +6,58 @@ var mouseY = 0;
 
 var audios_= [];
 const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
+var audioCtx;
 
 function setup()
 {
     var ids = ['food', 'turn', 'move', 'win', 'die'];
-    var loaded = 0;
-    ids.forEach(function(id)
+    if (AudioContext)
     {
-        var request = new XMLHttpRequest();
-        request.open('GET', cross_asset_domain_ + 'wave/' + id + '.wav', cross_asset_async_);
-        request.responseType = 'arraybuffer';
-        request.onload = function()
+        audioCtx = new AudioContext();
+    }
+    var loads = ids.map(function(id)
+    {
+        if (!audioCtx)
         {
-            var audioData = request.response;
-            audioCtx.decodeAudioData(audioData, function(buffer)
+            return Promise.reject();
+        }
+        return new Promise(function(resolve, reject)
+        {
+            var request = new XMLHttpRequest();
+            request.open('GET', cross_asset_domain_ + 'wave/' + id + '.wav',
+                cross_asset_async_);
+            request.responseType = 'arraybuffer';
+            request.onload = function()
             {
-                audios_[id] = buffer;
-                if (++loaded == ids.length)
-                {
-                    setTimeout(notifyResize, 0, 'image');
-                }
-            });
-        };
-        request.send();
+                audioCtx.decodeAudioData(
+                    request.response,
+                    function(buffer)
+                    {
+                        audios_[id] = buffer;
+                        resolve();
+                    },
+                    reject);
+            };
+            request.onerror = reject;
+            request.send();
+        });
+    });
+    Promise.allSettled(loads).then(function()
+    {
+        notifyResize('image');
     });
 }
 
 function playAudio(id)
 {
+    if (!audioCtx || !audios_[id])
+    {
+        return;
+    }
+    if (audioCtx.state === 'suspended')
+    {
+        audioCtx.resume();
+    }
     var source = audioCtx.createBufferSource();
     source.buffer = audios_[id];
     source.connect(audioCtx.destination);
@@ -90,6 +113,50 @@ function mouseUp(event)
         }
         CallHandler('game', 'drag', Math.round(mX) + ' ' + Math.round(mY));
     }
+}
+
+function keyDown(event)
+{
+    if (event.repeat)
+    {
+        return;
+    }
+    var mX = 0;
+    var mY = 0;
+    switch (event.key)
+    {
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+        mX = -1;
+        break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+        mX = 1;
+        break;
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+        mY = -1;
+        break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+        mY = 1;
+        break;
+    case ' ':
+    case 'Enter':
+        break;
+    default:
+        return;
+    }
+    event.preventDefault();
+    if (cross_pointer_upsidedown_)
+    {
+        mY = -mY;
+    }
+    CallHandler('game', 'drag', mX + ' ' + mY);
 }
 
 function resetImage(receiver, index, id)

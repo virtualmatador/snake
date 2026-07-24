@@ -26,11 +26,11 @@ namespace main
     private:
         static inline const int32_t bpp_ = 4;
         using PIXEL = std::array<unsigned char, bpp_>;
-        static inline const PIXEL color_empty_ = {16, 16, 16, 255};
-        static inline const PIXEL color_food_ = {64, 64, 64, 255};
-        static inline const PIXEL color_head_ = {48, 48, 48, 255};
-        static inline const PIXEL color_tail_ = {32, 32, 32, 255};
-        static inline const PIXEL color_border_ = {0, 0, 0, 255};
+        static inline const PIXEL color_background_ = {1, 1, 1, 255};
+        static inline const PIXEL color_board_ = {0, 0, 0, 255};
+        static inline const PIXEL color_food_ = {3, 3, 3, 255};
+        static inline const PIXEL color_head_ = {2, 2, 2, 255};
+        static inline const PIXEL color_tail_ = {1, 1, 1, 255};
         static inline const int32_t request_width_ = 480;
         static inline const int32_t columns_ = 10;
         static inline const int32_t animation_frames_ = 4;
@@ -49,7 +49,6 @@ namespace main
         int frame_;
         int pattern_frame_;
         int cell_;
-        int border_;
         int margin_[2];
         std::vector<unsigned char> pattern_base_;
         std::vector<unsigned char> pattern_current_;
@@ -78,7 +77,7 @@ namespace main
         int Move();
         void Play(bool turn);
         void ApplyBoard(PIXEL* pixels);
-        void DrawBorder(PIXEL* pixels);
+        void DrawBoard(PIXEL* pixels);
         void DrawFood(PIXEL* pixels);
         void DrawHead(PIXEL* pixels);
         void DrawTail(PIXEL* pixels,

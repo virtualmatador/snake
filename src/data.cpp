@@ -6,6 +6,7 @@
 //  Copyright © 2020 Shaidin. All rights reserved.
 //
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 
@@ -42,6 +43,8 @@ void main::Data::Load()
         toolbox::Load("GAME_EAT", eat_, 0, eat_max_ + 1);
         toolbox::Load("GAME_SCORE", score_, 0, score_max_ + 1);
         toolbox::Load("GAME_SIDE", side_, -2, 3);
+        if (side_ == 0)
+            throw "";
         toolbox::Load("GAME_SOUND", sound_, false, false);
         toolbox::Load("GAME_FOOD_Y", food_[0], 0, c_y_);
         toolbox::Load("GAME_FOOD_X", food_[1], 0, c_x_);
@@ -71,6 +74,23 @@ void main::Data::Load()
                     throw "";
             }
         }
+        for (auto previous = parts_.begin(), current = std::next(previous);
+            current != parts_.end(); ++previous, ++current)
+        {
+            if (std::abs((*previous)[0] - (*current)[0]) +
+                std::abs((*previous)[1] - (*current)[1]) != 1)
+                throw "";
+        }
+        for (const auto & part : parts_)
+            if (part == food_)
+                throw "";
+        const auto & head = parts_.front();
+        const auto & neck = *std::next(parts_.begin());
+        if ((side_ == -1 && neck[0] < head[0]) ||
+            (side_ == 1 && neck[0] > head[0]) ||
+            (side_ == -2 && neck[1] < head[1]) ||
+            (side_ == 2 && neck[1] > head[1]))
+            throw "";
     }
     catch(...)
     {
@@ -127,8 +147,21 @@ void main::Data::ResetSnakeFood()
 void main::Data::ResetFood()
 {
     if (parts_.size() == c_y_ * c_x_)
-        for (int i = 0; i < c_y_ * c_x_ / 2; ++i)
+    {
+        for (int i = 1; i < c_y_ * c_x_ / 2; ++i)
             parts_.pop_front();
+        const auto last_removed = parts_.front();
+        parts_.pop_front();
+        const auto & head = parts_.front();
+        if (last_removed[0] < head[0])
+            side_ = -1;
+        else if (last_removed[0] > head[0])
+            side_ = 1;
+        else if (last_removed[1] < head[1])
+            side_ = -2;
+        else
+            side_ = 2;
+    }
     int dist = std::uniform_int_distribution<int>(0, c_y_ * c_x_ - (int)parts_.size() - 1)(random_);
     for (food_[0] = 0; food_[0] < c_y_; ++food_[0])
     {
