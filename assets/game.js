@@ -168,6 +168,10 @@ function resetImage(receiver, index, id)
 function notifyResize(command)
 {
     var image = document.getElementById('image');
+    if (!image || !image.offsetWidth || !widths_['image'])
+    {
+        return;
+    }
     heights_['image'] = Math.round(widths_['image'] * image.offsetHeight / image.offsetWidth);
     CallHandler('body', command,  widths_['image'] + ' ' + heights_['image']);
 }

@@ -19,11 +19,11 @@
 #include "progress.h"
 
 main::Game::Game()
-    : run_{true}
+    : run_{false}
+    , frame_length_{std::chrono::milliseconds(50)}
     , width_{0}
     , height_{0}
     , order_rgba_{0x00010203}
-    , frame_length_{std::chrono::milliseconds(50)}
     , drag_{0}
     , pause_{true}
     , frame_{0}
@@ -33,22 +33,47 @@ main::Game::Game()
     , image_index_{0}
 {
     SetHandlers();
-    bridge::LoadView(index_,
-        (std::int32_t)core::VIEW_INFO::Landscape |
-        (std::int32_t)core::VIEW_INFO::ScreenOn |
-        (std::int32_t)core::VIEW_INFO::AudioNoSolo,
-        "game");
 }
 
 main::Game::~Game()
 {
-    pixels_lock_.lock();
-    run_ = false;
-    pixels_lock_.unlock();
-    if (worker_.joinable())
+    StopWorker();
+}
+
+void main::Game::Attach()
+{
+    bridge::SetAudioNoSolo(true);
+    bridge::SetLayout(false, true);
+    bridge::LoadView(Index(), "game");
+}
+
+void main::Game::Detach()
+{
+    image_ready_ = false;
+}
+
+void main::Game::Resume()
+{
+    bridge::SetScreenOn(true);
+    if (image_ready_)
+        StartWorker();
+}
+
+void main::Game::Suspend()
+{
+    StopWorker();
+    bridge::SetScreenOn(false);
+}
+
+void main::Game::StopWorker()
+{
     {
-        worker_.join();
+        std::lock_guard<std::mutex> lock{pixels_lock_};
+        run_ = false;
     }
+    waiter_.notify_all();
+    if (worker_.joinable())
+        worker_.join();
 }
 
 void main::Game::SetHandlers()
@@ -62,11 +87,23 @@ void main::Game::SetHandlers()
         else if (std::strcmp(command, "image") == 0)
             Run(info);
         else if (std::strcmp(command, "resize") == 0)
-            Resize(info);
+        {
+            if (image_ready_)
+                Resize(info);
+            else
+                Run(info);
+        }
         else if (std::strcmp(command, "escape") == 0)
             Escape();
         else if (std::strcmp(command, "back") == 0)
-            ApplyBack();
+        {
+            bool paused;
+            {
+                std::lock_guard<std::mutex> lock{pixels_lock_};
+                paused = pause_;
+            }
+            ApplyBack(paused);
+        }
     };
     handlers_["game"] = [&](const char* command, const char* info)
     {
@@ -76,7 +113,7 @@ void main::Game::SetHandlers()
             Tick();
         else if (std::strcmp(command, "audio") == 0)
             PlayAudio(info);
-        else if (std::strcmp(command, "drag") == 0)
+        else if (std::strcmp(command, "drag") == 0 && image_ready_)
             Drag(info);
     };
 }
@@ -92,8 +129,17 @@ void main::Game::Setup()
 
 void main::Game::Run(const char* dimensions)
 {
-    Resize(dimensions);
-    worker_ = std::thread([this, index = index_]()
+    if (image_ready_ || !Resize(dimensions))
+        return;
+    image_ready_ = true;
+    ApplyBack(pause_);
+    StartWorker();
+}
+
+void main::Game::StartWorker()
+{
+    run_ = true;
+    worker_ = std::thread([this, index = Index()]()
     {
         auto frame_time = std::chrono::steady_clock::now();
         for (;;)
@@ -126,18 +172,20 @@ void main::Game::Run(const char* dimensions)
 
 void main::Game::Tick()
 {
-    bridge::ResetImage(index_, ++image_index_, "image");
+    if (image_ready_)
+        bridge::ResetImage(Index(), ++image_index_, "image");
 }
 
-void main::Game::Resize(const char* size)
+bool main::Game::Resize(const char* size)
 {
     std::istringstream parser(size);
     int32_t width = 0;
     int32_t height = 0;
-    parser >> width >> height;
-    height = height * request_width_ / width;
-    width = request_width_;
+    if (!(parser >> width >> height) || width != request_width_ ||
+        height < data_.c_y_ + 1)
+        return false;
     Initial(width, height);
+    return true;
 }
 
 void main::Game::FeedUri(const char* uri, std::function<void(
@@ -151,7 +199,7 @@ void main::Game::FeedUri(const char* uri, std::function<void(
 void main::Game::Escape()
 {
     main::progress_ = main::PROGRESS::MENU;
-    bridge::NeedRestart();
+    RequestStage();
 }
 
 void main::Game::Initial(int32_t width, int32_t height)
@@ -209,7 +257,7 @@ void main::Game::Step()
     }
     auto bitmap = &pixels_[54];
     ApplyBoard((PIXEL*)bitmap);
-    stereogram::Convert<bpp_>(bitmap, (width_ / columns_), width_, height_, 1,
+    stereogram::Convert<bpp_, 256, 1>(bitmap, (width_ / columns_), width_, height_,
         pattern_current_.data());
 }
 
@@ -375,7 +423,7 @@ void main::Game::Play(bool turn)
     frame_ = 0;
     if (data_.sound_)
     {
-        bridge::AsyncMessage(index_, "game", "audio", audio);
+        bridge::AsyncMessage(Index(), "game", "audio", audio);
     }
 }
 
@@ -457,18 +505,18 @@ void main::Game::UpdatePause(bool state, bool async)
     pause_ = state;
     if (async)
     {
-        bridge::AsyncMessage(index_, "body", "back", "");
+        bridge::AsyncMessage(Index(), "body", "back", "");
     }
     else
     {
-        ApplyBack();
+        ApplyBack(state);
     }
 }
 
-void main::Game::ApplyBack()
+void main::Game::ApplyBack(bool paused)
 {
     std::ostringstream js;
-    js << "showBack(" << (pause_ ? "true" : "false") << ");";
+    js << "showBack(" << (paused ? "true" : "false") << ");";
     bridge::CallFunction(js.str().c_str());
 }
 

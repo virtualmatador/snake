@@ -1,5 +1,5 @@
 target=Snake
 identifier=com.shaidin.snake
-version=1.23.0
+version=1.24.0
 internet=false
 guid=D699CE39-12C2-434E-9CDD-1735FEA5A026

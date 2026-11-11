@@ -38,6 +38,7 @@ namespace main
     private:
         std::thread worker_;
         bool run_;
+        bool image_ready_ = false;
         std::chrono::milliseconds frame_length_;
         std::mutex pixels_lock_;
         std::condition_variable waiter_;
@@ -62,12 +63,18 @@ namespace main
         ~Game();
 
     private:
+        void Attach() override;
+        void Detach() override;
+        void Resume() override;
+        void Suspend() override;
         void Escape() override;
         void FeedUri(const char* uri, std::function<void(
             const std::vector<unsigned char>&)>&& consume) override;
         void Setup();
         void Run(const char* dimensions);
-        void Resize(const char* size);
+        void StartWorker();
+        void StopWorker();
+        bool Resize(const char* size);
         void Tick();
         void Initial(int32_t width, int32_t height);
         void Step();
@@ -83,7 +90,7 @@ namespace main
         void DrawTail(PIXEL* pixels,
             const std::array<int, 2> & tail, const int side);
         void UpdatePause(bool state, bool async);
-        void ApplyBack();
+        void ApplyBack(bool paused);
         void PlayAudio(const char* audio);
     };
 }

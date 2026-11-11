@@ -34,3 +34,10 @@ function sound()
 {
     CallHandler("sound", "click", document.getElementById("sound").checked.toString());
 }
+
+function showSaveVersionError()
+{
+    document.getElementById("save-version-error").hidden = false;
+    document.getElementById("play").disabled = true;
+    document.getElementById("sound").disabled = true;
+}

@@ -7,14 +7,11 @@
 //
 
 #include <cstdlib>
-#include <iostream>
-#include <sstream>
-
-#include "bridge.h"
+#include <istream>
+#include <ostream>
+#include <utility>
 
 #include "data.h"
-
-#include "toolbox.hpp"
 
 main::Data main::data_;
 
@@ -35,98 +32,90 @@ main::Data::~Data()
 {
 }
 
-void main::Data::Load()
+void main::Data::Load(std::istream& input)
 {
-    try
+    Reset();
+    input >> std::dec >> std::noboolalpha >> std::skipws;
+    int version = 0;
+    if (!(input >> version))
+        return;
+    if (version != save_version_)
     {
-        toolbox::Load("GAME_LIVES", lives_, 0, lives_max_ + 1);
-        toolbox::Load("GAME_EAT", eat_, 0, eat_max_ + 1);
-        toolbox::Load("GAME_SCORE", score_, 0, score_max_ + 1);
-        toolbox::Load("GAME_SIDE", side_, -2, 3);
-        if (side_ == 0)
-            throw "";
-        toolbox::Load("GAME_SOUND", sound_, false, false);
-        toolbox::Load("GAME_FOOD_Y", food_[0], 0, c_y_);
-        toolbox::Load("GAME_FOOD_X", food_[1], 0, c_x_);
-        int snake_size;
-        toolbox::Load("GAME_SNAKE_SIZE", snake_size, 3, c_x_ * c_y_);
-        parts_.clear();
-        for (int i = 0; i < snake_size; ++i)
-        {
-            decltype(parts_)::value_type part;
-            {
-                std::ostringstream composer;
-                composer << "GAME_SNAKE_Y_" << i;
-                toolbox::Load(composer.str().c_str(), part[0], 0, c_y_);
-            }
-            {
-                std::ostringstream composer;
-                composer << "GAME_SNAKE_X_" << i;
-                toolbox::Load(composer.str().c_str(), part[1], 0, c_x_);
-            }
-            parts_.push_back(part);
-        }
-        for (auto left_it = parts_.begin(); left_it != parts_.end(); ++left_it)
-        {
-            for (auto right_it = std::next(left_it); right_it != parts_.end(); ++right_it)
-            {
-                if (*left_it == *right_it)
-                    throw "";
-            }
-        }
-        for (auto previous = parts_.begin(), current = std::next(previous);
-            current != parts_.end(); ++previous, ++current)
-        {
-            if (std::abs((*previous)[0] - (*current)[0]) +
-                std::abs((*previous)[1] - (*current)[1]) != 1)
-                throw "";
-        }
-        for (const auto & part : parts_)
-            if (part == food_)
-                throw "";
-        const auto & head = parts_.front();
-        const auto & neck = *std::next(parts_.begin());
-        if ((side_ == -1 && neck[0] < head[0]) ||
-            (side_ == 1 && neck[0] > head[0]) ||
-            (side_ == -2 && neck[1] < head[1]) ||
-            (side_ == 2 && neck[1] > head[1]))
-            throw "";
+        incompatible_save_ = true;
+        return;
     }
-    catch(...)
+
+    int lives, eat, score, side, snake_size;
+    bool sound;
+    std::array<int, 2> food;
+    if (!(input >> lives >> eat >> score >> side >> sound
+                >> food[0] >> food[1] >> snake_size) ||
+        lives < 0 || lives > lives_max_ || eat < 0 || eat > eat_max_ ||
+        score < 0 || score > score_max_ || side == 0 || side < -2 || side > 2 ||
+        food[0] < 0 || food[0] >= c_y_ || food[1] < 0 || food[1] >= c_x_ ||
+        snake_size < 3 || snake_size >= c_x_ * c_y_)
+        return;
+
+    decltype(parts_) parts;
+    std::array<std::array<bool, c_x_>, c_y_> occupied{};
+    occupied[food[0]][food[1]] = true;
+    for (int i = 0; i < snake_size; ++i)
     {
-        Reset();
+        std::array<int, 2> part;
+        if (!(input >> part[0] >> part[1]) ||
+            part[0] < 0 || part[0] >= c_y_ || part[1] < 0 || part[1] >= c_x_ ||
+            occupied[part[0]][part[1]])
+            return;
+        if (!parts.empty() &&
+            std::abs(parts.back()[0] - part[0]) +
+            std::abs(parts.back()[1] - part[1]) != 1)
+            return;
+        occupied[part[0]][part[1]] = true;
+        parts.push_back(part);
     }
+
+    const auto& head = parts.front();
+    const auto& neck = *std::next(parts.begin());
+    if ((side == -1 && neck[0] < head[0]) ||
+        (side == 1 && neck[0] > head[0]) ||
+        (side == -2 && neck[1] < head[1]) ||
+        (side == 2 && neck[1] > head[1]))
+        return;
+
+    input >> std::ws;
+    if (!input.eof() || input.bad())
+        return;
+
+    lives_ = lives;
+    eat_ = eat;
+    score_ = score;
+    side_ = side;
+    sound_ = sound;
+    food_ = food;
+    parts_ = std::move(parts);
 }
 
-void main::Data::Save()
+void main::Data::Save(std::ostream& output) const
 {
-    toolbox::Save("GAME_LIVES", lives_);
-    toolbox::Save("GAME_EAT", eat_);
-    toolbox::Save("GAME_SCORE", score_);
-    toolbox::Save("GAME_SIDE", side_);
-    toolbox::Save("GAME_SOUND", sound_);
-    toolbox::Save("GAME_FOOD_Y", food_[0]);
-    toolbox::Save("GAME_FOOD_X", food_[1]);
-    toolbox::Save("GAME_SNAKE_SIZE", (int)parts_.size());
-    int i = 0;
-    for (const auto part : parts_)
+    if (incompatible_save_)
     {
-        {
-            std::ostringstream composer;
-            composer << "GAME_SNAKE_Y_" << i;
-            toolbox::Save(composer.str().c_str(), part[0]);
-        }
-        {
-            std::ostringstream composer;
-            composer << "GAME_SNAKE_X_" << i;
-            toolbox::Save(composer.str().c_str(), part[1]);
-        }
-         ++i;
+        output.setstate(std::ios::failbit);
+        return;
     }
+
+    output << std::dec << std::noboolalpha << std::noshowbase << std::noshowpos;
+    output.width(0);
+    output << save_version_ << '\n'
+           << lives_ << ' ' << eat_ << ' ' << score_ << ' ' << side_ << ' ' << sound_ << '\n'
+           << food_[0] << ' ' << food_[1] << '\n'
+           << parts_.size() << '\n';
+    for (const auto& part : parts_)
+        output << part[0] << ' ' << part[1] << '\n';
 }
 
 void main::Data::Reset()
 {
+    incompatible_save_ = false;
     lives_ = lives_max_;
     eat_ = 0;
     score_ = 0;

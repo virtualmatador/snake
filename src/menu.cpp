@@ -9,8 +9,6 @@
 #include <sstream>
 #include <cstring>
 
-#include "helper.h"
-
 #include "menu.h"
 #include "data.h"
 #include "progress.h"
@@ -40,6 +38,8 @@ main::Menu::Menu()
             js.clear();
             js << "setSound(" << data_.sound_ << ")";
             bridge::CallFunction(js.str().c_str());
+            if (data_.incompatible_save_)
+                bridge::CallFunction("showSaveVersionError()");
         }
     };
     handlers_["play"] = [&](const char* command, const char* info)
@@ -62,7 +62,7 @@ main::Menu::Menu()
             return;
         else if (std::strcmp(command, "click") == 0)
         {
-            if (std::strlen(info) == 0)
+            if (data_.incompatible_save_ || std::strlen(info) == 0)
                 return;
             else if (std::strcmp(info, "true") == 0)
                 data_.sound_ = true;
@@ -70,10 +70,13 @@ main::Menu::Menu()
                 data_.sound_ = false;
         }
     };
-    bridge::LoadView(index_,
-        (std::int32_t)core::VIEW_INFO::Default |
-        (std::int32_t)core::VIEW_INFO::AudioNoSolo,
-        "menu");
+}
+
+void main::Menu::Attach()
+{
+    bridge::SetAudioNoSolo(true);
+    bridge::SetLayout(false, false);
+    bridge::LoadView(Index(), "menu");
 }
 
 main::Menu::~Menu()
@@ -92,12 +95,14 @@ void main::Menu::Escape()
 
 void main::Menu::Play()
 {
+    if (data_.incompatible_save_)
+        return;
     progress_ = PROGRESS::GAME;
-    bridge::NeedRestart();
+    RequestStage();
 }
 
 void main::Menu::Reset()
 {
     data_.Reset();
-    bridge::NeedRestart();
+    RequestStage();
 }

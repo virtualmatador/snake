@@ -10,6 +10,7 @@
 #define SRC_DATA_H
 
 #include <array>
+#include <iosfwd>
 #include <list>
 #include <random>
 
@@ -29,14 +30,16 @@ namespace main
     public:
         Data();
         ~Data();
-        void Load();
-        void Save();
+        void Load(std::istream& input);
+        void Save(std::ostream& output) const;
         void Reset();
         void ResetSnakeFood();
         void ResetFood();
         int GetDelay();
 
     private:
+        static constexpr int save_version_ = 1;
+        bool incompatible_save_ = false;
         int lives_;
         int eat_;
         int score_;

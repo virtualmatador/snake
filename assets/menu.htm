@@ -10,6 +10,9 @@
 </head>
 
 <body>
+    <p id="save-version-error" role="alert" hidden>
+        This version of Snake cannot read the saved game. Use Reset to start a new game.
+    </p>
     <table id="controls">
         <tr>
             <td colspan="2" class="title">
@@ -23,7 +26,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                <button onclick="play()">Play</button>
+                <button id="play" onclick="play()">Play</button>
             </td>
         </tr>
         <tr>
